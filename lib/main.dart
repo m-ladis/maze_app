@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:ui';
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MainMenu(),
+      home: const MainMenu(),
     );
   }
 }
@@ -210,6 +211,19 @@ class MyHomePageState extends State<MyHomePage> {
                                         height,
                                         widget.hint.toList(),
                                         snapshot.requireData),
+                                    child: FutureBuilder<ui.Image>(
+                                      future: getUiImage(
+                                          "assets/mouse.jpeg", 20, 20),
+                                      builder: (context, snapshot) {
+                                        return CustomPaint(
+                                            painter: MousePainter(
+                                                widget.mazeRows,
+                                                widget.mazeColumns,
+                                                width,
+                                                height,
+                                                snapshot.requireData));
+                                      },
+                                    ),
                                   );
                                 },
                               ));
@@ -375,10 +389,10 @@ class PawsPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     double wallLength = (width - mazePadding * 2) / mazeRows;
 
-    pawsLocation.forEach((element) {
+    for (var element in pawsLocation) {
       canvas.drawImage(pawsIcon,
           Offset(element.a * wallLength, element.b * wallLength), Paint());
-    });
+    }
   }
 
   @override
@@ -397,4 +411,35 @@ Future<ui.Image> getUiImage(
   );
   final image = (await codec.getNextFrame()).image;
   return image;
+}
+
+class MousePainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
+  final double width;
+  final double height;
+  final ui.Image mouseIcon;
+
+  MousePainter(
+      this.mazeRows, this.mazeColumns, this.width, this.height, this.mouseIcon);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Random rand = Random();
+    int mouseX = rand.nextInt(mazeRows);
+    int mouseY = rand.nextInt(mazeColumns);
+
+    double wallLength = (width - mazePadding * 2) / mazeRows;
+
+    canvas.drawImage(
+        mouseIcon,
+        Offset(mouseX * wallLength + wallLength / 6,
+            mouseY * wallLength + wallLength / 6),
+        Paint());
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
 }
