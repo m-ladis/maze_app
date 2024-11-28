@@ -1,42 +1,35 @@
 import 'dart:math';
 
 import 'package:maze_app/model/maze_cell.dart';
+import 'package:maze_app/model/maze_generator.dart';
+import 'package:maze_app/model/maze_generator.dart';
+import 'package:maze_app/model/maze_generator.dart';
+import 'package:maze_app/model/maze_generator.dart';
+import 'package:maze_app/model/maze_generator.dart';
 import 'package:maze_app/model/stack.dart';
 
-// easy 10x10
-// normal 15x20
-// hard 20x25
-const mazeRows = 20;
-const mazeColumns = 20;
-
-const mazeRowsEasy = 10;
-const mazeColumnsEasy = 10;
-
-const mazeRowsNormal = 15;
-const mazeColumnsNormal = 20;
-
-const mazeRowsHard = 15;
-const mazeColumnsHard = 20;
-
-class MazeGeneratorEasy {
+class MazeGeneratorNormal {
   Random rand = Random();
   var mazeCells = List<List>.generate(
-      mazeRowsEasy,
-      (i) => List<MazeCell>.generate(
-          mazeColumnsEasy, (index) => MazeCell(position: Pair(i, index)),
+      mazeRowsNormal,
+          (i) => List<MazeCell>.generate(
+          mazeColumnsNormal
+              , (index) => MazeCell(position: Pair(i, index)),
           growable: false),
       growable: false);
   var mazeStack = Stack<MazeCell>();
 
   void generate() {
-    for (int i = 0; i < mazeRowsEasy; i++) {
-      for (int j = 0; j < mazeColumnsEasy; j++) {
+    for (int i = 0; i < mazeRowsNormal; i++) {
+      for (int j = 0; j < mazeColumnsNormal
+      ; j++) {
         mazeCells[i][j] = MazeCell(position: Pair(i, j));
       }
     }
 
-    int startX = rand.nextInt(mazeRowsEasy);
-    int startY = rand.nextInt(mazeColumnsEasy);
+    int startX = rand.nextInt(mazeRowsNormal);
+    int startY = rand.nextInt(mazeColumnsNormal
+    );
 
     mazeCells[startX][startY].isVisited = true;
     mazeStack.push(mazeCells[startX][startY]);
@@ -47,15 +40,15 @@ class MazeGeneratorEasy {
 
       if (topMazeCell.position.a > 0) {
         MazeCell leftNeighborMazeCell =
-            (mazeCells[topMazeCell.position.a - 1][topMazeCell.position.b]);
+        (mazeCells[topMazeCell.position.a - 1][topMazeCell.position.b]);
 
         if (!leftNeighborMazeCell.isVisited) {
           nextSteps.add(leftNeighborMazeCell);
         }
       }
-      if (topMazeCell.position.a < mazeRowsEasy - 1) {
+      if (topMazeCell.position.a < mazeRowsNormal - 1) {
         MazeCell rightNeighborMazeCell =
-            (mazeCells[topMazeCell.position.a + 1][topMazeCell.position.b]);
+        (mazeCells[topMazeCell.position.a + 1][topMazeCell.position.b]);
 
         if (!rightNeighborMazeCell.isVisited) {
           nextSteps.add(rightNeighborMazeCell);
@@ -63,15 +56,16 @@ class MazeGeneratorEasy {
       }
       if (topMazeCell.position.b > 0) {
         MazeCell topNeighborMazeCell =
-            (mazeCells[topMazeCell.position.a][topMazeCell.position.b - 1]);
+        (mazeCells[topMazeCell.position.a][topMazeCell.position.b - 1]);
 
         if (!topNeighborMazeCell.isVisited) {
           nextSteps.add(topNeighborMazeCell);
         }
       }
-      if (topMazeCell.position.b < mazeColumnsEasy - 1) {
+      if (topMazeCell.position.b < mazeColumnsNormal
+          - 1) {
         MazeCell bottomNeighborMazeCell =
-            (mazeCells[topMazeCell.position.a][topMazeCell.position.b + 1]);
+        (mazeCells[topMazeCell.position.a][topMazeCell.position.b + 1]);
 
         if (!bottomNeighborMazeCell.isVisited) {
           nextSteps.add(bottomNeighborMazeCell);
@@ -108,6 +102,7 @@ class MazeGeneratorEasy {
       }
     }
 
-    (mazeCells[mazeRowsEasy - 1][mazeColumnsEasy - 1]).wallDownOpened = true;
+    (mazeCells[mazeRowsNormal - 1][mazeColumnsNormal
+        - 1]).wallDownOpened = true;
   }
 }
