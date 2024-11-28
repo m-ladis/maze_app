@@ -119,6 +119,11 @@ class MyHomePageState extends State<MyHomePage> {
                             widget.rand.nextInt(widget.mazeRows - 1) + 1,
                             widget.rand.nextInt(widget.mazeColumns - 1) + 1);
                       });
+                      if (widget.mouseEnabled) {
+                        widget.mazeGenerator.closeDoors();
+                      } else {
+                        widget.mazeGenerator.openDoors();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
