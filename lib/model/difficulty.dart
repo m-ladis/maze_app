@@ -9,6 +9,6 @@ Pair<int, int> getCellsForDifficulty(Difficulty difficulty) {
     case Difficulty.normal:
       return Pair(20, 15);
     case Difficulty.hard:
-      return Pair(20, 15);
+      return Pair(5, 5);
   }
 }

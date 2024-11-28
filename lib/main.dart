@@ -36,7 +36,10 @@ class MyHomePage extends StatefulWidget {
   final int mazeRows;
   final int mazeColumns;
   final bool hintEnabled;
+  bool mouseEnabled;
   final Pair<int, int> playerPositionCell = Pair(0, 0);
+  final rand = Random();
+  late Pair<int, int> mousePositionCell;
   late MazeGenerator mazeGenerator;
 
   var hint = List<Pair<int, int>>.empty(growable: true);
@@ -46,8 +49,11 @@ class MyHomePage extends StatefulWidget {
       required this.title,
       required this.mazeRows,
       required this.mazeColumns,
-      required this.hintEnabled}) {
+      required this.hintEnabled,
+      required this.mouseEnabled}) {
     mazeGenerator = MazeGenerator(mazeColumns: mazeColumns, mazeRows: mazeRows);
+    mousePositionCell =
+        Pair(rand.nextInt(mazeRows - 1) + 1, rand.nextInt(mazeColumns - 1) + 1);
   }
 
   @override
@@ -62,6 +68,11 @@ class MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     widget.mazeGenerator.generate();
+    if (widget.mouseEnabled) {
+      widget.mazeGenerator.closeDoors();
+    } else {
+      widget.mazeGenerator.openDoors();
+    }
   }
 
   @override
@@ -104,6 +115,9 @@ class MyHomePageState extends State<MyHomePage> {
                         widget.mazeGenerator.generate();
                         widget.playerPositionCell.a = 0;
                         widget.playerPositionCell.b = 0;
+                        widget.mousePositionCell = Pair(
+                            widget.rand.nextInt(widget.mazeRows - 1) + 1,
+                            widget.rand.nextInt(widget.mazeColumns - 1) + 1);
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -122,6 +136,12 @@ class MyHomePageState extends State<MyHomePage> {
                   widget.playerPositionCell.a = widget.playerPositionCell.a - 1;
                   widget.hint.clear();
                 }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
+                }
               });
             },
             moveUp: () {
@@ -132,6 +152,12 @@ class MyHomePageState extends State<MyHomePage> {
                   widget.playerPositionCell.b = widget.playerPositionCell.b - 1;
                   widget.hint.clear();
                 }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
+                }
               });
             },
             moveRight: () {
@@ -141,6 +167,12 @@ class MyHomePageState extends State<MyHomePage> {
                     .wallRightOpened) {
                   widget.playerPositionCell.a = widget.playerPositionCell.a + 1;
                   widget.hint.clear();
+                }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
                 }
               });
             },
@@ -156,6 +188,13 @@ class MyHomePageState extends State<MyHomePage> {
                     widget.hint.clear();
                   }
                 }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
+                }
+
                 //kraj igre
                 if (widget.playerPositionCell.b >= widget.mazeColumns) {
                   showDialog(
@@ -168,11 +207,7 @@ class MyHomePageState extends State<MyHomePage> {
                               ElevatedButton(
                                 child: const Text("Play again"),
                                 onPressed: () {
-                                  setState(() {
-                                    widget.mazeGenerator.generate();
-                                    widget.playerPositionCell.a = 0;
-                                    widget.playerPositionCell.b = 0;
-                                  });
+                                  Navigator.pop(context);
                                   Navigator.pop(context);
                                 },
                               ),
@@ -221,7 +256,9 @@ class MyHomePageState extends State<MyHomePage> {
                                                 widget.mazeColumns,
                                                 width,
                                                 height,
-                                                snapshot.requireData));
+                                                widget.mousePositionCell,
+                                                snapshot.requireData,
+                                                widget.mouseEnabled));
                                       },
                                     ),
                                   );
@@ -418,24 +455,24 @@ class MousePainter extends CustomPainter {
   final int mazeColumns;
   final double width;
   final double height;
+  final Pair<int, int> mousePositionCell;
   final ui.Image mouseIcon;
+  final bool isEnabled;
 
-  MousePainter(
-      this.mazeRows, this.mazeColumns, this.width, this.height, this.mouseIcon);
+  MousePainter(this.mazeRows, this.mazeColumns, this.width, this.height,
+      this.mousePositionCell, this.mouseIcon, this.isEnabled);
 
   @override
   void paint(Canvas canvas, Size size) {
-    Random rand = Random();
-    int mouseX = rand.nextInt(mazeRows);
-    int mouseY = rand.nextInt(mazeColumns);
+    if (isEnabled) {
+      double wallLength = (width - mazePadding * 2) / mazeRows;
 
-    double wallLength = (width - mazePadding * 2) / mazeRows;
-
-    canvas.drawImage(
-        mouseIcon,
-        Offset(mouseX * wallLength + wallLength / 6,
-            mouseY * wallLength + wallLength / 6),
-        Paint());
+      canvas.drawImage(
+          mouseIcon,
+          Offset(mousePositionCell.a * wallLength + wallLength / 6,
+              mousePositionCell.b * wallLength + wallLength / 6),
+          Paint());
+    }
   }
 
   @override

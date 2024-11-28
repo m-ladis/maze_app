@@ -101,7 +101,13 @@ class MazeGenerator {
         mazeStack.pop();
       }
     }
+  }
 
+  void openDoors() {
     (mazeCells[mazeRows - 1][mazeColumns - 1]).wallDownOpened = true;
+  }
+
+  void closeDoors() {
+    (mazeCells[mazeRows - 1][mazeColumns - 1]).wallDownOpened = false;
   }
 }

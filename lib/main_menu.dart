@@ -43,6 +43,7 @@ class _MainMenuState extends State<MainMenu> {
                               mazeRows:
                                   getCellsForDifficulty(Difficulty.easy).b,
                               hintEnabled: true,
+                              mouseEnabled: false,
                             )));
               },
               child: Text('Easy'),
@@ -61,6 +62,7 @@ class _MainMenuState extends State<MainMenu> {
                               mazeRows:
                                   getCellsForDifficulty(Difficulty.normal).b,
                               hintEnabled: true,
+                              mouseEnabled: false,
                             )));
               },
               child: Text('Normal'),
@@ -79,6 +81,7 @@ class _MainMenuState extends State<MainMenu> {
                               mazeRows:
                                   getCellsForDifficulty(Difficulty.hard).b,
                               hintEnabled: false,
+                              mouseEnabled: true,
                             )));
               },
               child: Text('Hard'),
