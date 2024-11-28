@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:maze_app/model/difficulty.dart';
 import 'main.dart';
-import 'model/difficulty.dart';
 
 class MainMenu extends StatefulWidget {
+  const MainMenu({super.key});
+
   @override
   _MainMenuState createState() => _MainMenuState();
 }
@@ -36,24 +38,46 @@ class _MainMenuState extends State<MainMenu> {
                     MaterialPageRoute(
                         builder: (context) => MyHomePage(
                             title: 'Maze App',
-                            mazeColumns: getCellsForDifficulty(setDifficulty).a,
-                            mazeRows: getCellsForDifficulty(setDifficulty).b)));
+                            mazeColumns:
+                                getCellsForDifficulty(Difficulty.easy).a,
+                            mazeRows:
+                                getCellsForDifficulty(Difficulty.easy).b)));
               },
-              child: Text('Start game'),
+              child: Text('Easy'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Action for Button 1
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                            title: 'Maze App',
+                            mazeColumns:
+                                getCellsForDifficulty(Difficulty.normal).a,
+                            mazeRows:
+                                getCellsForDifficulty(Difficulty.normal).b)));
+              },
+              child: Text('Normal'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Action for Button 1
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                            title: 'Maze App',
+                            mazeColumns:
+                                getCellsForDifficulty(Difficulty.hard).a,
+                            mazeRows:
+                                getCellsForDifficulty(Difficulty.hard).b)));
+              },
+              child: Text('Hard'),
             ),
             SizedBox(height: 20), // Adds spacing between the buttons
-            Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Action for Button 2
-                    switchState();
-                  },
-                  child: Text('Difficulty'),
-                ),
-                Text(setDifficulty.name),
-              ],
-            )
           ],
         ),
       ),
