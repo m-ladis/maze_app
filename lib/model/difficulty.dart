@@ -7,8 +7,8 @@ Pair<int, int> getCellsForDifficulty(Difficulty difficulty) {
     case Difficulty.easy:
       return Pair(10, 10);
     case Difficulty.normal:
-      return Pair(20, 15);
+      return Pair(15, 15);
     case Difficulty.hard:
-      return Pair(5, 5);
+      return Pair(15, 15);
   }
 }
