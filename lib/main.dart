@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maze_app/main_menu.dart';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
 import 'package:maze_app/model/path_finder.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(title: 'Maze App'),
+      home: MainMenu(),
     );
   }
 }
