@@ -34,6 +34,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
   final int mazeRows;
   final int mazeColumns;
+  final bool hintEnabled;
   final Pair<int, int> playerPositionCell = Pair(0, 0);
   late MazeGenerator mazeGenerator;
 
@@ -43,7 +44,8 @@ class MyHomePage extends StatefulWidget {
       {super.key,
       required this.title,
       required this.mazeRows,
-      required this.mazeColumns}) {
+      required this.mazeColumns,
+      required this.hintEnabled}) {
     mazeGenerator = MazeGenerator(mazeColumns: mazeColumns, mazeRows: mazeRows);
   }
 
@@ -71,25 +73,28 @@ class MyHomePageState extends State<MyHomePage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
           actions: [
-            Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                child: ElevatedButton(
-                    onPressed: () {
-                      var fastestWayOut = findFastestWayOut(
-                          widget.mazeRows,
-                          widget.mazeColumns,
-                          widget.playerPositionCell,
-                          widget.mazeGenerator.mazeCells);
-                      setState(() {
-                        widget.hint =
-                            calculateHint(fastestWayOut.toList()).toList();
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                    child: const Row(
-                      children: [Icon(Icons.lightbulb_rounded)],
-                    ))),
+            if (widget.hintEnabled)
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        if (widget.hintEnabled) {
+                          var fastestWayOut = findFastestWayOut(
+                              widget.mazeRows,
+                              widget.mazeColumns,
+                              widget.playerPositionCell,
+                              widget.mazeGenerator.mazeCells);
+                          setState(() {
+                            widget.hint =
+                                calculateHint(fastestWayOut.toList()).toList();
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
+                      child: const Row(
+                        children: [Icon(Icons.lightbulb_rounded)],
+                      ))),
             Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                 child: ElevatedButton(

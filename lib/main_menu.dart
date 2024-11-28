@@ -37,11 +37,13 @@ class _MainMenuState extends State<MainMenu> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => MyHomePage(
-                            title: 'Maze App',
-                            mazeColumns:
-                                getCellsForDifficulty(Difficulty.easy).a,
-                            mazeRows:
-                                getCellsForDifficulty(Difficulty.easy).b)));
+                              title: 'Maze App',
+                              mazeColumns:
+                                  getCellsForDifficulty(Difficulty.easy).a,
+                              mazeRows:
+                                  getCellsForDifficulty(Difficulty.easy).b,
+                              hintEnabled: true,
+                            )));
               },
               child: Text('Easy'),
             ),
@@ -53,11 +55,13 @@ class _MainMenuState extends State<MainMenu> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => MyHomePage(
-                            title: 'Maze App',
-                            mazeColumns:
-                                getCellsForDifficulty(Difficulty.normal).a,
-                            mazeRows:
-                                getCellsForDifficulty(Difficulty.normal).b)));
+                              title: 'Maze App',
+                              mazeColumns:
+                                  getCellsForDifficulty(Difficulty.normal).a,
+                              mazeRows:
+                                  getCellsForDifficulty(Difficulty.normal).b,
+                              hintEnabled: true,
+                            )));
               },
               child: Text('Normal'),
             ),
@@ -69,11 +73,13 @@ class _MainMenuState extends State<MainMenu> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => MyHomePage(
-                            title: 'Maze App',
-                            mazeColumns:
-                                getCellsForDifficulty(Difficulty.hard).a,
-                            mazeRows:
-                                getCellsForDifficulty(Difficulty.hard).b)));
+                              title: 'Maze App',
+                              mazeColumns:
+                                  getCellsForDifficulty(Difficulty.hard).a,
+                              mazeRows:
+                                  getCellsForDifficulty(Difficulty.hard).b,
+                              hintEnabled: false,
+                            )));
               },
               child: Text('Hard'),
             ),
