@@ -3,9 +3,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maze_app/difficulty.dart';
 import 'package:maze_app/main_menu.dart';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
+import 'package:maze_app/model/maze_generator_normal.dart';
 import 'package:maze_app/model/path_finder.dart';
 
 const mazePadding = 20.0;
@@ -32,11 +34,12 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   final String title;
+  final Difficulty difficulty;
   final Pair<int, int> playerPositionCell = Pair(0, 0);
-  final MazeGenerator mazeGenerator = MazeGenerator();
+  final MazeGeneratorEasy mazeGenerator = MazeGeneratorEasy();
   var hint = List<Pair<int, int>>.empty(growable: true);
 
-  MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title, required this.difficulty});
 
   @override
   State<StatefulWidget> createState() {
@@ -128,7 +131,7 @@ class MyHomePageState extends State<MyHomePage> {
             },
             moveDown: () {
               setState(() {
-                if (widget.playerPositionCell.b < mazeColumns) {
+                if (widget.playerPositionCell.b < mazeColumnsEasy) {
                   if ((widget.mazeGenerator
                               .mazeCells[widget.playerPositionCell.a]
                           [widget.playerPositionCell.b])
@@ -139,7 +142,7 @@ class MyHomePageState extends State<MyHomePage> {
                   }
                 }
                 //kraj igre
-                if (widget.playerPositionCell.b >= mazeColumns) {
+                if (widget.playerPositionCell.b >= mazeColumnsEasy) {
                   showDialog(
                       barrierDismissible: false,
                       context: context,
@@ -170,7 +173,7 @@ class MyHomePageState extends State<MyHomePage> {
                     painter: MazePainter(
                         width, height, widget.mazeGenerator.mazeCells),
                     child: FutureBuilder<ui.Image>(
-                        future: getUiImage("assets/lost_cat.png", 20, 20),
+                        future: getUiImage("assets/lost_cat.png", 30, 30),
                         builder: (context, snapshot) {
                           return CustomPaint(
                               painter: PlayerPainter(
@@ -260,10 +263,10 @@ class MazePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double wallLength = (width - mazePadding * 2) / mazeRows;
+    double wallLength = (width - mazePadding * 2) / mazeRowsEasy;
 
-    for (var i = 0; i < mazeRows; i++) {
-      for (var j = 0; j < mazeColumns; j++) {
+    for (var i = 0; i < mazeRowsEasy; i++) {
+      for (var j = 0; j < mazeColumnsEasy; j++) {
         MazeCell mazeCell = mazeCells[i][j];
         if (!mazeCell.wallLeftOpened) {
           canvas.drawLine(
@@ -318,7 +321,7 @@ class PlayerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double wallLength = (width - mazePadding * 2) / mazeRows;
+    double wallLength = (width - mazePadding * 2) / mazeRowsEasy ;
 
     canvas.drawImage(
         playerIcon,
@@ -343,7 +346,7 @@ class PawsPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double wallLength = (width - mazePadding * 2) / mazeRows;
+    double wallLength = (width - mazePadding * 2) / mazeRowsEasy;
 
     pawsLocation.forEach((element) {
       canvas.drawImage(pawsIcon,
