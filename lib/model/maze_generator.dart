@@ -3,18 +3,24 @@ import 'dart:math';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/stack.dart';
 
-const mazeRows = 15;
-const mazeColumns = 15;
-
 class MazeGenerator {
-  Random rand = Random();
-  var mazeCells = List<List>.generate(
-      mazeRows,
-      (i) => List<MazeCell>.generate(
-          mazeColumns, (index) => MazeCell(position: Pair(i, index)),
-          growable: false),
-      growable: false);
-  var mazeStack = Stack<MazeCell>();
+  final int mazeRows;
+  final int mazeColumns;
+
+  late Random rand;
+  late List<List> mazeCells;
+  late Stack<MazeCell> mazeStack;
+
+  MazeGenerator({required this.mazeRows, required this.mazeColumns}) {
+    rand = Random();
+    mazeCells = List<List>.generate(
+        mazeRows,
+        (i) => List<MazeCell>.generate(
+            mazeColumns, (index) => MazeCell(position: Pair(i, index)),
+            growable: false),
+        growable: false);
+    mazeStack = Stack<MazeCell>();
+  }
 
   void generate() {
     for (int i = 0; i < mazeRows; i++) {

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maze_app/main_menu.dart';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
 import 'package:maze_app/model/path_finder.dart';
@@ -24,18 +25,27 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(title: 'Maze App'),
+      home: MainMenu(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   final String title;
+  final int mazeRows;
+  final int mazeColumns;
   final Pair<int, int> playerPositionCell = Pair(0, 0);
-  final MazeGenerator mazeGenerator = MazeGenerator();
+  late MazeGenerator mazeGenerator;
+
   var hint = List<Pair<int, int>>.empty(growable: true);
 
-  MyHomePage({super.key, required this.title});
+  MyHomePage(
+      {super.key,
+      required this.title,
+      required this.mazeRows,
+      required this.mazeColumns}) {
+    mazeGenerator = MazeGenerator(mazeColumns: mazeColumns, mazeRows: mazeRows);
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -47,6 +57,7 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   initState() {
     super.initState();
+
     widget.mazeGenerator.generate();
   }
 
@@ -65,6 +76,8 @@ class MyHomePageState extends State<MyHomePage> {
                 child: ElevatedButton(
                     onPressed: () {
                       var fastestWayOut = findFastestWayOut(
+                          widget.mazeRows,
+                          widget.mazeColumns,
                           widget.playerPositionCell,
                           widget.mazeGenerator.mazeCells);
                       setState(() {
@@ -127,7 +140,7 @@ class MyHomePageState extends State<MyHomePage> {
             },
             moveDown: () {
               setState(() {
-                if (widget.playerPositionCell.b < mazeColumns) {
+                if (widget.playerPositionCell.b < widget.mazeColumns) {
                   if ((widget.mazeGenerator
                               .mazeCells[widget.playerPositionCell.a]
                           [widget.playerPositionCell.b])
@@ -138,7 +151,7 @@ class MyHomePageState extends State<MyHomePage> {
                   }
                 }
                 //kraj igre
-                if (widget.playerPositionCell.b >= mazeColumns) {
+                if (widget.playerPositionCell.b >= widget.mazeColumns) {
                   showDialog(
                       barrierDismissible: false,
                       context: context,
@@ -164,15 +177,18 @@ class MyHomePageState extends State<MyHomePage> {
               });
             },
             child: Padding(
-                padding: const EdgeInsets.fromLTRB(mazePadding,150,mazePadding,0),
+                padding:
+                    const EdgeInsets.fromLTRB(mazePadding, 150, mazePadding, 0),
                 child: CustomPaint(
-                    painter: MazePainter(
+                    painter: MazePainter(widget.mazeRows, widget.mazeColumns,
                         width, height, widget.mazeGenerator.mazeCells),
                     child: FutureBuilder<ui.Image>(
                         future: getUiImage("assets/lost_cat.png", 20, 20),
                         builder: (context, snapshot) {
                           return CustomPaint(
                               painter: PlayerPainter(
+                                  widget.mazeRows,
+                                  widget.mazeColumns,
                                   width,
                                   height,
                                   widget.playerPositionCell,
@@ -183,6 +199,8 @@ class MyHomePageState extends State<MyHomePage> {
                                 builder: (context, snapshot) {
                                   return CustomPaint(
                                     painter: PawsPainter(
+                                        widget.mazeRows,
+                                        widget.mazeColumns,
                                         width,
                                         height,
                                         widget.hint.toList(),
@@ -251,11 +269,14 @@ class MazeGeasture extends StatelessWidget {
 }
 
 class MazePainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
   final double width;
   final double height;
   final List<List<dynamic>> mazeCells;
 
-  MazePainter(this.width, this.height, this.mazeCells);
+  MazePainter(
+      this.mazeRows, this.mazeColumns, this.width, this.height, this.mazeCells);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -307,13 +328,15 @@ class MazePainter extends CustomPainter {
 }
 
 class PlayerPainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
   final double width;
   final double height;
   final Pair playerPositionCell;
   final ui.Image playerIcon;
 
-  PlayerPainter(
-      this.width, this.height, this.playerPositionCell, this.playerIcon);
+  PlayerPainter(this.mazeRows, this.mazeColumns, this.width, this.height,
+      this.playerPositionCell, this.playerIcon);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -321,8 +344,8 @@ class PlayerPainter extends CustomPainter {
 
     canvas.drawImage(
         playerIcon,
-        Offset(playerPositionCell.a * wallLength,
-            playerPositionCell.b * wallLength),
+        Offset(playerPositionCell.a * wallLength + wallLength / 6,
+            playerPositionCell.b * wallLength + wallLength / 6),
         Paint());
   }
 
@@ -333,12 +356,15 @@ class PlayerPainter extends CustomPainter {
 }
 
 class PawsPainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
   final double width;
   final double height;
   final List<Pair<int, int>> pawsLocation;
   final ui.Image pawsIcon;
 
-  PawsPainter(this.width, this.height, this.pawsLocation, this.pawsIcon);
+  PawsPainter(this.mazeRows, this.mazeColumns, this.width, this.height,
+      this.pawsLocation, this.pawsIcon);
 
   @override
   void paint(Canvas canvas, Size size) {
