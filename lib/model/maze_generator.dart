@@ -3,40 +3,34 @@ import 'dart:math';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/stack.dart';
 
-// easy 10x10
-// normal 15x20
-// hard 20x25
-const mazeRows = 20;
-const mazeColumns = 20;
+class MazeGenerator {
+  final int mazeRows;
+  final int mazeColumns;
 
-const mazeRowsEasy = 10;
-const mazeColumnsEasy = 10;
+  late Random rand;
+  late List<List> mazeCells;
+  late Stack<MazeCell> mazeStack;
 
-const mazeRowsNormal = 15;
-const mazeColumnsNormal = 20;
-
-const mazeRowsHard = 15;
-const mazeColumnsHard = 20;
-
-class MazeGeneratorEasy {
-  Random rand = Random();
-  var mazeCells = List<List>.generate(
-      mazeRowsEasy,
-      (i) => List<MazeCell>.generate(
-          mazeColumnsEasy, (index) => MazeCell(position: Pair(i, index)),
-          growable: false),
-      growable: false);
-  var mazeStack = Stack<MazeCell>();
+  MazeGenerator({required this.mazeRows, required this.mazeColumns}) {
+    rand = Random();
+    mazeCells = List<List>.generate(
+        mazeRows,
+        (i) => List<MazeCell>.generate(
+            mazeColumns, (index) => MazeCell(position: Pair(i, index)),
+            growable: false),
+        growable: false);
+    mazeStack = Stack<MazeCell>();
+  }
 
   void generate() {
-    for (int i = 0; i < mazeRowsEasy; i++) {
-      for (int j = 0; j < mazeColumnsEasy; j++) {
+    for (int i = 0; i < mazeRows; i++) {
+      for (int j = 0; j < mazeColumns; j++) {
         mazeCells[i][j] = MazeCell(position: Pair(i, j));
       }
     }
 
-    int startX = rand.nextInt(mazeRowsEasy);
-    int startY = rand.nextInt(mazeColumnsEasy);
+    int startX = rand.nextInt(mazeRows);
+    int startY = rand.nextInt(mazeColumns);
 
     mazeCells[startX][startY].isVisited = true;
     mazeStack.push(mazeCells[startX][startY]);
@@ -53,7 +47,7 @@ class MazeGeneratorEasy {
           nextSteps.add(leftNeighborMazeCell);
         }
       }
-      if (topMazeCell.position.a < mazeRowsEasy - 1) {
+      if (topMazeCell.position.a < mazeRows - 1) {
         MazeCell rightNeighborMazeCell =
             (mazeCells[topMazeCell.position.a + 1][topMazeCell.position.b]);
 
@@ -69,7 +63,7 @@ class MazeGeneratorEasy {
           nextSteps.add(topNeighborMazeCell);
         }
       }
-      if (topMazeCell.position.b < mazeColumnsEasy - 1) {
+      if (topMazeCell.position.b < mazeColumns - 1) {
         MazeCell bottomNeighborMazeCell =
             (mazeCells[topMazeCell.position.a][topMazeCell.position.b + 1]);
 
@@ -107,7 +101,13 @@ class MazeGeneratorEasy {
         mazeStack.pop();
       }
     }
+  }
 
-    (mazeCells[mazeRowsEasy - 1][mazeColumnsEasy - 1]).wallDownOpened = true;
+  void openDoors() {
+    (mazeCells[mazeRows - 1][mazeColumns - 1]).wallDownOpened = true;
+  }
+
+  void closeDoors() {
+    (mazeCells[mazeRows - 1][mazeColumns - 1]).wallDownOpened = false;
   }
 }

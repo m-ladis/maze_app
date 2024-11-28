@@ -1,17 +1,10 @@
-import 'dart:ui' as ui;
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:maze_app/difficulty.dart';
-import 'package:maze_app/model/homepages.dart';
-import 'package:maze_app/model/maze_cell.dart';
-import 'package:maze_app/model/maze_generator.dart';
-import 'package:maze_app/model/path_finder.dart';
-
+import 'package:maze_app/model/difficulty.dart';
 import 'main.dart';
 
 class MainMenu extends StatefulWidget {
+  const MainMenu({super.key});
+
   @override
   _MainMenuState createState() => _MainMenuState();
 }
@@ -21,9 +14,8 @@ class _MainMenuState extends State<MainMenu> {
 
   void switchState() {
     setState(() {
-      setDifficulty = Difficulty.values[
-        (setDifficulty.index + 1) % Difficulty.values.length
-      ];
+      setDifficulty = Difficulty
+          .values[(setDifficulty.index + 1) % Difficulty.values.length];
     });
   }
 
@@ -42,9 +34,17 @@ class _MainMenuState extends State<MainMenu> {
               onPressed: () {
                 // Action for Button 1
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage(title: 'Maze App', difficulty: Difficulty.easy,))
-                );
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                              title: 'Maze App',
+                              mazeColumns:
+                                  getCellsForDifficulty(Difficulty.easy).a,
+                              mazeRows:
+                                  getCellsForDifficulty(Difficulty.easy).b,
+                              hintEnabled: true,
+                              mouseEnabled: false,
+                            )));
               },
               child: Text('Easy'),
             ),
@@ -54,8 +54,16 @@ class _MainMenuState extends State<MainMenu> {
                 // Action for Button 1
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MyHomePageNormal(title: 'Maze App', difficulty: Difficulty.easy,))
-                );
+                    MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                              title: 'Maze App',
+                              mazeColumns:
+                                  getCellsForDifficulty(Difficulty.normal).a,
+                              mazeRows:
+                                  getCellsForDifficulty(Difficulty.normal).b,
+                              hintEnabled: true,
+                              mouseEnabled: false,
+                            )));
               },
               child: Text('Normal'),
             ),
@@ -65,8 +73,16 @@ class _MainMenuState extends State<MainMenu> {
                 // Action for Button 1
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MyHomePageHard(title: 'Maze App', difficulty: Difficulty.easy,))
-                );
+                    MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                              title: 'Maze App',
+                              mazeColumns:
+                                  getCellsForDifficulty(Difficulty.hard).a,
+                              mazeRows:
+                                  getCellsForDifficulty(Difficulty.hard).b,
+                              hintEnabled: false,
+                              mouseEnabled: true,
+                            )));
               },
               child: Text('Hard'),
             ),

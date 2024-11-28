@@ -1,13 +1,12 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:maze_app/difficulty.dart';
 import 'package:maze_app/main_menu.dart';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
-import 'package:maze_app/model/maze_generator_normal.dart';
 import 'package:maze_app/model/path_finder.dart';
 
 const mazePadding = 20.0;
@@ -27,19 +26,35 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MainMenu(),
+      home: const MainMenu(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   final String title;
-  final Difficulty difficulty;
+  final int mazeRows;
+  final int mazeColumns;
+  final bool hintEnabled;
+  bool mouseEnabled;
   final Pair<int, int> playerPositionCell = Pair(0, 0);
-  final MazeGeneratorEasy mazeGenerator = MazeGeneratorEasy();
+  final rand = Random();
+  late Pair<int, int> mousePositionCell;
+  late MazeGenerator mazeGenerator;
+
   var hint = List<Pair<int, int>>.empty(growable: true);
 
-  MyHomePage({super.key, required this.title, required this.difficulty});
+  MyHomePage(
+      {super.key,
+      required this.title,
+      required this.mazeRows,
+      required this.mazeColumns,
+      required this.hintEnabled,
+      required this.mouseEnabled}) {
+    mazeGenerator = MazeGenerator(mazeColumns: mazeColumns, mazeRows: mazeRows);
+    mousePositionCell =
+        Pair(rand.nextInt(mazeRows - 1) + 1, rand.nextInt(mazeColumns - 1) + 1);
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -51,7 +66,13 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   initState() {
     super.initState();
+
     widget.mazeGenerator.generate();
+    if (widget.mouseEnabled) {
+      widget.mazeGenerator.closeDoors();
+    } else {
+      widget.mazeGenerator.openDoors();
+    }
   }
 
   @override
@@ -64,23 +85,28 @@ class MyHomePageState extends State<MyHomePage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
           actions: [
-            Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                child: ElevatedButton(
-                    onPressed: () {
-                      var fastestWayOut = findFastestWayOut(
-                          widget.playerPositionCell,
-                          widget.mazeGenerator.mazeCells);
-                      setState(() {
-                        widget.hint =
-                            calculateHint(fastestWayOut.toList()).toList();
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                    child: const Row(
-                      children: [Icon(Icons.lightbulb_rounded)],
-                    ))),
+            if (widget.hintEnabled)
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        if (widget.hintEnabled) {
+                          var fastestWayOut = findFastestWayOut(
+                              widget.mazeRows,
+                              widget.mazeColumns,
+                              widget.playerPositionCell,
+                              widget.mazeGenerator.mazeCells);
+                          setState(() {
+                            widget.hint =
+                                calculateHint(fastestWayOut.toList()).toList();
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0)),
+                      child: const Row(
+                        children: [Icon(Icons.lightbulb_rounded)],
+                      ))),
             Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                 child: ElevatedButton(
@@ -89,6 +115,9 @@ class MyHomePageState extends State<MyHomePage> {
                         widget.mazeGenerator.generate();
                         widget.playerPositionCell.a = 0;
                         widget.playerPositionCell.b = 0;
+                        widget.mousePositionCell = Pair(
+                            widget.rand.nextInt(widget.mazeRows - 1) + 1,
+                            widget.rand.nextInt(widget.mazeColumns - 1) + 1);
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -107,6 +136,12 @@ class MyHomePageState extends State<MyHomePage> {
                   widget.playerPositionCell.a = widget.playerPositionCell.a - 1;
                   widget.hint.clear();
                 }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
+                }
               });
             },
             moveUp: () {
@@ -116,6 +151,12 @@ class MyHomePageState extends State<MyHomePage> {
                     .wallUpOpened) {
                   widget.playerPositionCell.b = widget.playerPositionCell.b - 1;
                   widget.hint.clear();
+                }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
                 }
               });
             },
@@ -127,11 +168,17 @@ class MyHomePageState extends State<MyHomePage> {
                   widget.playerPositionCell.a = widget.playerPositionCell.a + 1;
                   widget.hint.clear();
                 }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
+                }
               });
             },
             moveDown: () {
               setState(() {
-                if (widget.playerPositionCell.b < mazeColumnsEasy) {
+                if (widget.playerPositionCell.b < widget.mazeColumns) {
                   if ((widget.mazeGenerator
                               .mazeCells[widget.playerPositionCell.a]
                           [widget.playerPositionCell.b])
@@ -141,8 +188,15 @@ class MyHomePageState extends State<MyHomePage> {
                     widget.hint.clear();
                   }
                 }
+
+                if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
+                    widget.playerPositionCell.b == widget.mousePositionCell.b) {
+                  widget.mouseEnabled = false;
+                  widget.mazeGenerator.openDoors();
+                }
+
                 //kraj igre
-                if (widget.playerPositionCell.b >= mazeColumnsEasy) {
+                if (widget.playerPositionCell.b >= widget.mazeColumns) {
                   showDialog(
                       barrierDismissible: false,
                       context: context,
@@ -153,11 +207,7 @@ class MyHomePageState extends State<MyHomePage> {
                               ElevatedButton(
                                 child: const Text("Play again"),
                                 onPressed: () {
-                                  setState(() {
-                                    widget.mazeGenerator.generate();
-                                    widget.playerPositionCell.a = 0;
-                                    widget.playerPositionCell.b = 0;
-                                  });
+                                  Navigator.pop(context);
                                   Navigator.pop(context);
                                 },
                               ),
@@ -168,15 +218,18 @@ class MyHomePageState extends State<MyHomePage> {
               });
             },
             child: Padding(
-                padding: const EdgeInsets.fromLTRB(mazePadding,150,mazePadding,0),
+                padding:
+                    const EdgeInsets.fromLTRB(mazePadding, 150, mazePadding, 0),
                 child: CustomPaint(
-                    painter: MazePainter(
+                    painter: MazePainter(widget.mazeRows, widget.mazeColumns,
                         width, height, widget.mazeGenerator.mazeCells),
                     child: FutureBuilder<ui.Image>(
-                        future: getUiImage("assets/lost_cat.png", 30, 30),
+                        future: getUiImage("assets/lost_cat.png", 20, 20),
                         builder: (context, snapshot) {
                           return CustomPaint(
                               painter: PlayerPainter(
+                                  widget.mazeRows,
+                                  widget.mazeColumns,
                                   width,
                                   height,
                                   widget.playerPositionCell,
@@ -187,10 +240,27 @@ class MyHomePageState extends State<MyHomePage> {
                                 builder: (context, snapshot) {
                                   return CustomPaint(
                                     painter: PawsPainter(
+                                        widget.mazeRows,
+                                        widget.mazeColumns,
                                         width,
                                         height,
                                         widget.hint.toList(),
                                         snapshot.requireData),
+                                    child: FutureBuilder<ui.Image>(
+                                      future: getUiImage(
+                                          "assets/mouse.jpeg", 20, 20),
+                                      builder: (context, snapshot) {
+                                        return CustomPaint(
+                                            painter: MousePainter(
+                                                widget.mazeRows,
+                                                widget.mazeColumns,
+                                                width,
+                                                height,
+                                                widget.mousePositionCell,
+                                                snapshot.requireData,
+                                                widget.mouseEnabled));
+                                      },
+                                    ),
                                   );
                                 },
                               ));
@@ -255,18 +325,21 @@ class MazeGeasture extends StatelessWidget {
 }
 
 class MazePainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
   final double width;
   final double height;
   final List<List<dynamic>> mazeCells;
 
-  MazePainter(this.width, this.height, this.mazeCells);
+  MazePainter(
+      this.mazeRows, this.mazeColumns, this.width, this.height, this.mazeCells);
 
   @override
   void paint(Canvas canvas, Size size) {
-    double wallLength = (width - mazePadding * 2) / mazeRowsEasy;
+    double wallLength = (width - mazePadding * 2) / mazeRows;
 
-    for (var i = 0; i < mazeRowsEasy; i++) {
-      for (var j = 0; j < mazeColumnsEasy; j++) {
+    for (var i = 0; i < mazeRows; i++) {
+      for (var j = 0; j < mazeColumns; j++) {
         MazeCell mazeCell = mazeCells[i][j];
         if (!mazeCell.wallLeftOpened) {
           canvas.drawLine(
@@ -311,22 +384,24 @@ class MazePainter extends CustomPainter {
 }
 
 class PlayerPainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
   final double width;
   final double height;
   final Pair playerPositionCell;
   final ui.Image playerIcon;
 
-  PlayerPainter(
-      this.width, this.height, this.playerPositionCell, this.playerIcon);
+  PlayerPainter(this.mazeRows, this.mazeColumns, this.width, this.height,
+      this.playerPositionCell, this.playerIcon);
 
   @override
   void paint(Canvas canvas, Size size) {
-    double wallLength = (width - mazePadding * 2) / mazeRowsEasy ;
+    double wallLength = (width - mazePadding * 2) / mazeRows;
 
     canvas.drawImage(
         playerIcon,
-        Offset(playerPositionCell.a * wallLength,
-            playerPositionCell.b * wallLength),
+        Offset(playerPositionCell.a * wallLength + wallLength / 6,
+            playerPositionCell.b * wallLength + wallLength / 6),
         Paint());
   }
 
@@ -337,21 +412,24 @@ class PlayerPainter extends CustomPainter {
 }
 
 class PawsPainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
   final double width;
   final double height;
   final List<Pair<int, int>> pawsLocation;
   final ui.Image pawsIcon;
 
-  PawsPainter(this.width, this.height, this.pawsLocation, this.pawsIcon);
+  PawsPainter(this.mazeRows, this.mazeColumns, this.width, this.height,
+      this.pawsLocation, this.pawsIcon);
 
   @override
   void paint(Canvas canvas, Size size) {
-    double wallLength = (width - mazePadding * 2) / mazeRowsEasy;
+    double wallLength = (width - mazePadding * 2) / mazeRows;
 
-    pawsLocation.forEach((element) {
+    for (var element in pawsLocation) {
       canvas.drawImage(pawsIcon,
           Offset(element.a * wallLength, element.b * wallLength), Paint());
-    });
+    }
   }
 
   @override
@@ -370,4 +448,35 @@ Future<ui.Image> getUiImage(
   );
   final image = (await codec.getNextFrame()).image;
   return image;
+}
+
+class MousePainter extends CustomPainter {
+  final int mazeRows;
+  final int mazeColumns;
+  final double width;
+  final double height;
+  final Pair<int, int> mousePositionCell;
+  final ui.Image mouseIcon;
+  final bool isEnabled;
+
+  MousePainter(this.mazeRows, this.mazeColumns, this.width, this.height,
+      this.mousePositionCell, this.mouseIcon, this.isEnabled);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (isEnabled) {
+      double wallLength = (width - mazePadding * 2) / mazeRows;
+
+      canvas.drawImage(
+          mouseIcon,
+          Offset(mousePositionCell.a * wallLength + wallLength / 6,
+              mousePositionCell.b * wallLength + wallLength / 6),
+          Paint());
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
 }

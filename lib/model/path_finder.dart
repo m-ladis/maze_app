@@ -2,9 +2,8 @@ import 'dart:collection';
 import 'dart:core';
 
 import 'maze_cell.dart';
-import 'maze_generator.dart';
 
-Iterable<Pair<int, int>> findFastestWayOut(
+Iterable<Pair<int, int>> findFastestWayOut(int mazeRows, int mazeColumns,
     Pair<int, int> playerLocation, List<List<dynamic>> mazeCells) {
   Pair<int, int> currentLocation = Pair(playerLocation.a, playerLocation.b);
   Pair<int, int> helperPair = Pair(0, 0);
