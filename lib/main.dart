@@ -304,28 +304,23 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     setState(() {
       int newA = widget.playerPositionCell.a + dx;
       int newB = widget.playerPositionCell.b + dy;
-
       final cell = widget.mazeGenerator.mazeCells[widget.playerPositionCell.a]
           [widget.playerPositionCell.b];
-
       bool canMove = false;
       if (dx == -1 && cell.wallLeftOpened) canMove = true;
       if (dx == 1 && cell.wallRightOpened) canMove = true;
       if (dy == -1 && cell.wallUpOpened) canMove = true;
       if (dy == 1 && cell.wallDownOpened) canMove = true;
-
       if (canMove) {
         widget.playerPositionCell.a = newA;
         widget.playerPositionCell.b = newB;
         widget.hint.clear();
       }
-
       if (widget.playerPositionCell.a == widget.mousePositionCell.a &&
           widget.playerPositionCell.b == widget.mousePositionCell.b) {
         widget.mouseEnabled = false;
         widget.mazeGenerator.openDoors();
       }
-
       if (widget.playerPositionCell.b >= widget.mazeColumns) {
         showDialog(
             barrierDismissible: false,
@@ -422,10 +417,10 @@ class MazePainterStyled extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double mazeWidth = mazeColumns * cellSize;
-    final double mazeHeight = mazeRows * cellSize;
-    final double scaledOutline = min(cellSize, 30); // ili cellSize * 0.8
-    final double scaledCornerRadius = min(cellSize, 30); // ili cellSize * 0.8
+    final double mazeWidth = mazeRows * cellSize;
+    final double mazeHeight = mazeColumns * cellSize;
+    final double scaledOutline = min(cellSize, 30);
+    final double scaledCornerRadius = min(cellSize, 30);
 
     final Paint backgroundPaint = Paint()..color = const Color(0xFFF6EDE0);
     final Paint outerRoundedCornerPaint = Paint()
@@ -438,9 +433,7 @@ class MazePainterStyled extends CustomPainter {
       ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
 
-    // ----------------------
-    // 1) POZADINSKA PLOČA
-    // ----------------------
+    // POZADINSKA PLOČA
     final backgroundRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(
         offsetX - scaledOutline,
@@ -448,125 +441,77 @@ class MazePainterStyled extends CustomPainter {
         mazeWidth + 2 * scaledOutline,
         mazeHeight + 2 * scaledOutline,
       ),
-      Radius.circular(scaledCornerRadius), // <<< OVDJE JE RADIUS 30
+      Radius.circular(scaledCornerRadius),
     );
-
     canvas.drawRRect(backgroundRect, backgroundPaint);
 
-    // ----------------------
-    // 2) VANJSKI OKVIR SA ZAOBLJENIM KUTOVIMA
-    // ----------------------
-    final double left = offsetX;
-    final double top = offsetY;
-    final double right = offsetX + mazeWidth;
-    final double bottom = offsetY + mazeHeight;
+    // VANJSKI RUB
+    final left = offsetX;
+    final top = offsetY;
+    final right = offsetX + mazeWidth;
+    final bottom = offsetY + mazeHeight;
 
-    // GORNJI LIJEVI KUT
     canvas.drawArc(
-      Rect.fromLTWH(left, top, scaledCornerRadius * 2, scaledCornerRadius * 2),
-      pi, // startAngle
-      pi / 2, // sweepAngle 90°
-      false,
-      outerRoundedCornerPaint,
-    );
-
-    // GORNJA HORIZONTALNA STRANA
-    canvas.drawLine(
-      Offset(left + scaledCornerRadius, top),
-      Offset(right - scaledCornerRadius, top),
-      outerRoundedCornerPaint,
-    );
-
-    // GORNJI DESNI KUT
+        Rect.fromLTWH(
+            left, top, scaledCornerRadius * 2, scaledCornerRadius * 2),
+        pi,
+        pi / 2,
+        false,
+        outerRoundedCornerPaint);
+    canvas.drawLine(Offset(left + scaledCornerRadius, top),
+        Offset(right - scaledCornerRadius, top), outerRoundedCornerPaint);
     canvas.drawArc(
-      Rect.fromLTWH(right - 2 * scaledCornerRadius, top, scaledCornerRadius * 2,
-          scaledCornerRadius * 2),
-      -pi / 2,
-      pi / 2,
-      false,
-      outerRoundedCornerPaint,
-    );
-
-    // DESNA VERTIKALNA STRANA
-    canvas.drawLine(
-      Offset(right, top + scaledCornerRadius),
-      Offset(right, bottom - scaledCornerRadius),
-      outerRoundedCornerPaint,
-    );
-
-    // DONJI DESNI KUT
+        Rect.fromLTWH(right - 2 * scaledCornerRadius, top,
+            scaledCornerRadius * 2, scaledCornerRadius * 2),
+        -pi / 2,
+        pi / 2,
+        false,
+        outerRoundedCornerPaint);
+    canvas.drawLine(Offset(right, top + scaledCornerRadius),
+        Offset(right, bottom - scaledCornerRadius), outerRoundedCornerPaint);
     canvas.drawArc(
-      Rect.fromLTWH(
-          right - 2 * scaledCornerRadius,
-          bottom - 2 * scaledCornerRadius,
-          scaledCornerRadius * 2,
-          scaledCornerRadius * 2),
-      0,
-      pi / 2,
-      false,
-      Paint()..color = Colors.transparent,
-    );
-
-    // DONJA HORIZONTALNA STRANA
-    canvas.drawLine(
-      Offset(right - 2 * scaledCornerRadius, bottom),
-      Offset(left + scaledCornerRadius, bottom),
-      outerRoundedCornerPaint,
-    );
-
-    // DONJI LIJEVI KUT
+        Rect.fromLTWH(
+            right - 2 * scaledCornerRadius,
+            bottom - 2 * scaledCornerRadius,
+            scaledCornerRadius * 2,
+            scaledCornerRadius * 2),
+        0,
+        pi / 2,
+        false,
+        outerRoundedCornerPaint);
+    canvas.drawLine(Offset(right - scaledCornerRadius, bottom),
+        Offset(left + scaledCornerRadius, bottom), outerRoundedCornerPaint);
     canvas.drawArc(
-      Rect.fromLTWH(left, bottom - 2 * scaledCornerRadius,
-          scaledCornerRadius * 2, scaledCornerRadius * 2),
-      pi / 2,
-      pi / 2,
-      false,
-      outerRoundedCornerPaint,
-    );
+        Rect.fromLTWH(left, bottom - 2 * scaledCornerRadius,
+            scaledCornerRadius * 2, scaledCornerRadius * 2),
+        pi / 2,
+        pi / 2,
+        false,
+        outerRoundedCornerPaint);
+    canvas.drawLine(Offset(left, bottom - scaledCornerRadius),
+        Offset(left, top + scaledCornerRadius), outerRoundedCornerPaint);
 
-    // LIJEVA VERTIKALNA STRANA
-    canvas.drawLine(
-      Offset(left, bottom - scaledCornerRadius),
-      Offset(left, top + scaledCornerRadius),
-      outerRoundedCornerPaint,
-    );
-
-    // ----------------------
-    // 3) ZIDOVI LABIRINTA
-    // ----------------------
+    // ZIDOVI LABIRINTA
     for (var i = 0; i < mazeRows; i++) {
       for (var j = 0; j < mazeColumns; j++) {
         MazeCell cell = mazeCells[i][j];
         final x = cell.position.a * cellSize + offsetX;
         final y = cell.position.b * cellSize + offsetY;
 
-        // preskačemo vanjske ćoškove ako želiš
         if (i == 0 && j == 0 ||
             i == mazeRows - 1 && j == 0 ||
-            i == 0 && j == mazeColumns - 1) {
-          continue;
-        }
+            i == 0 && j == mazeColumns - 1) continue;
 
-        if (!cell.wallLeftOpened) {
+        if (!cell.wallLeftOpened)
           canvas.drawLine(Offset(x, y), Offset(x, y + cellSize), wallPaint);
-        }
-        if (!cell.wallUpOpened) {
+        if (!cell.wallUpOpened)
           canvas.drawLine(Offset(x, y), Offset(x + cellSize, y), wallPaint);
-        }
-        if (!cell.wallRightOpened) {
-          canvas.drawLine(
-            Offset(x + cellSize, y),
-            Offset(x + cellSize, y + cellSize),
-            wallPaint,
-          );
-        }
-        if (!cell.wallDownOpened) {
-          canvas.drawLine(
-            Offset(x, y + cellSize),
-            Offset(x + cellSize, y + cellSize),
-            wallPaint,
-          );
-        }
+        if (!cell.wallRightOpened)
+          canvas.drawLine(Offset(x + cellSize, y),
+              Offset(x + cellSize, y + cellSize), wallPaint);
+        if (!cell.wallDownOpened)
+          canvas.drawLine(Offset(x, y + cellSize),
+              Offset(x + cellSize, y + cellSize), wallPaint);
       }
     }
   }
