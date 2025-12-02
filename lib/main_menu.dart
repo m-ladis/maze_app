@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:maze_app/model/difficulty.dart';
 import 'animations.dart';
 import 'main.dart'; // uključi svoj MyHomePage i Difficulty klase
@@ -351,10 +352,11 @@ class _HoverButtonState extends State<HoverButton> {
           child: Center(
             child: Text(
               widget.text,
-              style: const TextStyle(
+              style: GoogleFonts.dynaPuff(
                 fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+                color: Color(0xFF3A4F75),
+                fontWeight: FontWeight.w500
+              )
             ),
           ),
         ),

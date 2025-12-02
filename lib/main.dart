@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:maze_app/main_menu.dart';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
@@ -129,7 +130,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               iconTheme: const IconThemeData(
                 color: Colors.white,
               ),
-              backgroundColor: const Color(0xFF3A4F75).withOpacity(0.85),
+              backgroundColor: const Color(0xFF3A4F75),
               elevation: 0,
               centerTitle: true,
               toolbarHeight: 70,
@@ -143,12 +144,12 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   children: [
                     Image.asset('assets/cat.png', height: 47),
                     const SizedBox(width: 10),
-                    const Text(
+                    Text(
                       "Maze Game",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.rubikPuddles(
+                        fontSize: 33,
                         color: Colors.white,
+                        fontWeight: FontWeight.w500,
                         letterSpacing: 1.1,
                       ),
                     ),
@@ -218,7 +219,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   double availableWidth =
                       constraints.maxWidth - mazePadding * 2 - maxOutline * 2;
                   double availableHeight =
-                      constraints.maxHeight - mazePadding * 2 - maxOutline * 2;
+                      constraints.maxHeight - mazePadding * 2 - maxOutline * 8;
 
                   // izračun veličine ćelije tako da cijeli labirint stane unutar ekrana
                   double cellWidth = availableWidth / widget.mazeRows;
@@ -231,7 +232,8 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
                   // centriranje labirinta
                   double offsetX = (constraints.maxWidth - mazeWidth) / 2;
-                  double offsetY = (constraints.maxHeight - mazeHeight) / 2;
+                  double offsetY =
+                      (constraints.maxHeight - mazeHeight) / 2 - cellSize / 2;
 
                   return Stack(
                     children: [
@@ -436,7 +438,6 @@ class MazePainterStyled extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final double mazeWidth = mazeRows * cellSize;
     final double mazeHeight = mazeColumns * cellSize;
-    final double scaledOutline = min(cellSize, 30);
     final double scaledCornerRadius = min(cellSize, 22);
 
     final Paint backgroundPaint = Paint()..color = const Color(0xffB8CAE6);
@@ -453,10 +454,10 @@ class MazePainterStyled extends CustomPainter {
     // POZADINSKA PLOČA
     final backgroundRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(
-        offsetX - scaledOutline,
-        offsetY - scaledOutline,
-        mazeWidth + 2 * scaledOutline,
-        mazeHeight + 2 * scaledOutline,
+        offsetX - cellSize,
+        offsetY - cellSize,
+        mazeWidth + 2 * cellSize,
+        mazeHeight + 3 * cellSize,
       ),
       Radius.circular(scaledCornerRadius),
     );
