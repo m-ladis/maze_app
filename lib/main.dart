@@ -198,95 +198,104 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         color: const Color(0xFF3A4F75),
         child: Center(
           child: MazeGeasture(
-            moveLeft: _moveLeft,
-            moveUp: _moveUp,
-            moveRight: _moveRight,
-            moveDown: _moveDown,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                double cellWidth =
-                    (constraints.maxWidth - mazePadding * 2) / widget.mazeRows;
-                double cellHeight = (constraints.maxHeight - mazePadding * 2) /
-                    widget.mazeColumns;
-                double cellSize = min(cellWidth, cellHeight);
+              moveLeft: _moveLeft,
+              moveUp: _moveUp,
+              moveRight: _moveRight,
+              moveDown: _moveDown,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const double maxOutline =
+                      30.0; // margin za pozadinu labirinta
 
-                double offsetX =
-                    (constraints.maxWidth - (cellSize * widget.mazeRows)) / 2;
-                double offsetY =
-                    (constraints.maxHeight - (cellSize * widget.mazeColumns)) /
-                        2;
+                  // dostupna širina i visina za labirint
+                  double availableWidth =
+                      constraints.maxWidth - mazePadding * 2 - maxOutline * 2;
+                  double availableHeight =
+                      constraints.maxHeight - mazePadding * 2 - maxOutline * 2;
 
-                return Stack(
-                  children: [
-                    CustomPaint(
-                      painter: MazePainterStyled(
-                        mazeRows: widget.mazeRows,
-                        mazeColumns: widget.mazeColumns,
-                        mazeCells: widget.mazeGenerator.mazeCells
-                            .cast<List<MazeCell>>(),
-                        cellSize: cellSize,
-                        offsetX: offsetX,
-                        offsetY: offsetY,
+                  // izračun veličine ćelije tako da cijeli labirint stane unutar ekrana
+                  double cellWidth = availableWidth / widget.mazeRows;
+                  double cellHeight = availableHeight / widget.mazeColumns;
+                  double cellSize = min(cellWidth, cellHeight);
+
+                  // dimenzije labirinta
+                  double mazeWidth = widget.mazeRows * cellSize;
+                  double mazeHeight = widget.mazeColumns * cellSize;
+
+                  // centriranje labirinta
+                  double offsetX = (constraints.maxWidth - mazeWidth) / 2;
+                  double offsetY = (constraints.maxHeight - mazeHeight) / 2;
+
+                  return Stack(
+                    children: [
+                      CustomPaint(
+                        painter: MazePainterStyled(
+                          mazeRows: widget.mazeRows,
+                          mazeColumns: widget.mazeColumns,
+                          mazeCells: widget.mazeGenerator.mazeCells
+                              .cast<List<MazeCell>>(),
+                          cellSize: cellSize,
+                          offsetX: offsetX,
+                          offsetY: offsetY,
+                        ),
+                        size: Size(constraints.maxWidth, constraints.maxHeight),
                       ),
-                      size: Size(constraints.maxWidth, constraints.maxHeight),
-                    ),
-                    if (imageLoaded)
-                      AnimatedBuilder(
-                        animation: _playerPulseController,
-                        builder: (context, child) {
-                          return CustomPaint(
-                            painter: PlayerPainterStyled(
-                              mazeRows: widget.mazeRows,
-                              mazeColumns: widget.mazeColumns,
-                              playerPositionCell: widget.playerPositionCell,
-                              scale: _playerPulseController.value,
-                              playerImage: playerImage,
-                              cellSize: cellSize,
-                              offsetX: offsetX,
-                              offsetY: offsetY,
-                            ),
-                            size: Size(
-                                constraints.maxWidth, constraints.maxHeight),
-                          );
-                        },
+                      if (imageLoaded)
+                        AnimatedBuilder(
+                          animation: _playerPulseController,
+                          builder: (context, child) {
+                            return CustomPaint(
+                              painter: PlayerPainterStyled(
+                                mazeRows: widget.mazeRows,
+                                mazeColumns: widget.mazeColumns,
+                                playerPositionCell: widget.playerPositionCell,
+                                scale: _playerPulseController.value,
+                                playerImage: playerImage,
+                                cellSize: cellSize,
+                                offsetX: offsetX,
+                                offsetY: offsetY,
+                              ),
+                              size: Size(
+                                  constraints.maxWidth, constraints.maxHeight),
+                            );
+                          },
+                        ),
+                      CustomPaint(
+                        painter: MousePainterStyled(
+                          mazeRows: widget.mazeRows,
+                          mazeColumns: widget.mazeColumns,
+                          mousePositionCell: widget.mousePositionCell,
+                          isEnabled: widget.mouseEnabled,
+                          cellSize: cellSize,
+                          offsetX: offsetX,
+                          offsetY: offsetY,
+                        ),
+                        size: Size(constraints.maxWidth, constraints.maxHeight),
                       ),
-                    CustomPaint(
-                      painter: MousePainterStyled(
-                        mazeRows: widget.mazeRows,
-                        mazeColumns: widget.mazeColumns,
-                        mousePositionCell: widget.mousePositionCell,
-                        isEnabled: widget.mouseEnabled,
-                        cellSize: cellSize,
-                        offsetX: offsetX,
-                        offsetY: offsetY,
-                      ),
-                      size: Size(constraints.maxWidth, constraints.maxHeight),
-                    ),
-                    if (imageLoaded)
-                      AnimatedBuilder(
-                        animation: _pawsController,
-                        builder: (context, child) {
-                          return CustomPaint(
-                            painter: PawHintPainterAnimated(
-                              mazeRows: widget.mazeRows,
-                              mazeColumns: widget.mazeColumns,
-                              pawsLocation: widget.hint.toList(),
-                              pawImage: pawImage,
-                              progress: _pawsController.value,
-                              cellSize: cellSize,
-                              offsetX: offsetX,
-                              offsetY: offsetY,
-                            ),
-                            size: Size(
-                                constraints.maxWidth, constraints.maxHeight),
-                          );
-                        },
-                      ),
-                  ],
-                );
-              },
-            ),
-          ),
+                      if (imageLoaded)
+                        AnimatedBuilder(
+                          animation: _pawsController,
+                          builder: (context, child) {
+                            return CustomPaint(
+                              painter: PawHintPainterAnimated(
+                                mazeRows: widget.mazeRows,
+                                mazeColumns: widget.mazeColumns,
+                                pawsLocation: widget.hint.toList(),
+                                pawImage: pawImage,
+                                progress: _pawsController.value,
+                                cellSize: cellSize,
+                                offsetX: offsetX,
+                                offsetY: offsetY,
+                              ),
+                              size: Size(
+                                  constraints.maxWidth, constraints.maxHeight),
+                            );
+                          },
+                        ),
+                    ],
+                  );
+                },
+              )),
         ),
       ),
     );
