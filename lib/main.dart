@@ -429,7 +429,7 @@ class MazePainterStyled extends CustomPainter {
     final double mazeWidth = mazeRows * cellSize;
     final double mazeHeight = mazeColumns * cellSize;
     final double scaledOutline = min(cellSize, 30);
-    final double scaledCornerRadius = min(cellSize, 30);
+    final double scaledCornerRadius = min(cellSize, 22);
 
     final Paint backgroundPaint = Paint()..color = const Color(0xFFF6EDE0);
     final Paint outerRoundedCornerPaint = Paint()
@@ -454,51 +454,83 @@ class MazePainterStyled extends CustomPainter {
     );
     canvas.drawRRect(backgroundRect, backgroundPaint);
 
-    // VANJSKI RUB
-    final left = offsetX;
-    final top = offsetY;
-    final right = offsetX + mazeWidth;
-    final bottom = offsetY + mazeHeight;
+    // ----------------------
+// 2) VANJSKI OKVIR SA ZAOBLJENIM KUTOVIMA
+// ----------------------
+    final double left = offsetX;
+    final double top = offsetY;
+    final double right = offsetX + mazeWidth;
+    final double bottom = offsetY + mazeHeight;
 
+// GORNJI LIJEVI KUT
     canvas.drawArc(
-        Rect.fromLTWH(
-            left, top, scaledCornerRadius * 2, scaledCornerRadius * 2),
-        pi,
-        pi / 2,
-        false,
-        outerRoundedCornerPaint);
-    canvas.drawLine(Offset(left + scaledCornerRadius, top),
-        Offset(right - scaledCornerRadius, top), outerRoundedCornerPaint);
+      Rect.fromLTWH(left, top, scaledCornerRadius * 2, scaledCornerRadius * 2),
+      pi, // startAngle
+      pi / 2, // sweepAngle 90°
+      false,
+      outerRoundedCornerPaint,
+    );
+
+// GORNJA HORIZONTALNA STRANA
+    canvas.drawLine(
+      Offset(left + scaledCornerRadius, top),
+      Offset(right - scaledCornerRadius, top),
+      outerRoundedCornerPaint,
+    );
+
+// GORNJI DESNI KUT
     canvas.drawArc(
-        Rect.fromLTWH(right - 2 * scaledCornerRadius, top,
-            scaledCornerRadius * 2, scaledCornerRadius * 2),
-        -pi / 2,
-        pi / 2,
-        false,
-        outerRoundedCornerPaint);
-    canvas.drawLine(Offset(right, top + scaledCornerRadius),
-        Offset(right, bottom - scaledCornerRadius), outerRoundedCornerPaint);
+      Rect.fromLTWH(right - 2 * scaledCornerRadius, top, scaledCornerRadius * 2,
+          scaledCornerRadius * 2),
+      -pi / 2,
+      pi / 2,
+      false,
+      outerRoundedCornerPaint,
+    );
+
+// DESNA VERTIKALNA STRANA
+    canvas.drawLine(
+      Offset(right, top + scaledCornerRadius),
+      Offset(right, bottom - scaledCornerRadius),
+      outerRoundedCornerPaint,
+    );
+
+// DONJI DESNI KUT
     canvas.drawArc(
-        Rect.fromLTWH(
-            right - 2 * scaledCornerRadius,
-            bottom - 2 * scaledCornerRadius,
-            scaledCornerRadius * 2,
-            scaledCornerRadius * 2),
-        0,
-        pi / 2,
-        false,
-        outerRoundedCornerPaint);
-    canvas.drawLine(Offset(right - scaledCornerRadius, bottom),
-        Offset(left + scaledCornerRadius, bottom), outerRoundedCornerPaint);
+      Rect.fromLTWH(
+          right - 2 * scaledCornerRadius,
+          bottom - 2 * scaledCornerRadius,
+          scaledCornerRadius * 2,
+          scaledCornerRadius * 2),
+      0,
+      pi / 2,
+      false,
+      Paint()..color = Colors.transparent,
+    );
+
+// DONJA HORIZONTALNA STRANA
+    canvas.drawLine(
+      Offset(right - 2 * scaledCornerRadius, bottom),
+      Offset(left + scaledCornerRadius, bottom),
+      outerRoundedCornerPaint,
+    );
+
+// DONJI LIJEVI KUT
     canvas.drawArc(
-        Rect.fromLTWH(left, bottom - 2 * scaledCornerRadius,
-            scaledCornerRadius * 2, scaledCornerRadius * 2),
-        pi / 2,
-        pi / 2,
-        false,
-        outerRoundedCornerPaint);
-    canvas.drawLine(Offset(left, bottom - scaledCornerRadius),
-        Offset(left, top + scaledCornerRadius), outerRoundedCornerPaint);
+      Rect.fromLTWH(left, bottom - 2 * scaledCornerRadius,
+          scaledCornerRadius * 2, scaledCornerRadius * 2),
+      pi / 2,
+      pi / 2,
+      false,
+      outerRoundedCornerPaint,
+    );
+
+// LIJEVA VERTIKALNA STRANA
+    canvas.drawLine(
+      Offset(left, bottom - scaledCornerRadius),
+      Offset(left, top + scaledCornerRadius),
+      outerRoundedCornerPaint,
+    );
 
     // ZIDOVI LABIRINTA
     for (var i = 0; i < mazeRows; i++) {
