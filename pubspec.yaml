@@ -36,6 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   equatable: ^2.0.5
+  audioplayers: ^6.5.1
 
 dev_dependencies:
   flutter_test:
@@ -93,3 +94,7 @@ flutter:
     - assets/lost_cat.png
     - assets/cat_paws.png
     - assets/mouse.jpeg
+    - assets/cat.png
+    - assets/paw.png
+    - assets/sounds/meow.wav
+    - assets/cat_hat.png
