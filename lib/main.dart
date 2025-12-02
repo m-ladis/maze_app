@@ -7,6 +7,8 @@ import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
 import 'package:maze_app/model/path_finder.dart';
 
+import 'animations.dart';
+
 const mazePadding = 20.0;
 
 void main() {
@@ -228,6 +230,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
                   return Stack(
                     children: [
+                      const AnimatedBackground(), // Šapice + Snijeg
                       CustomPaint(
                         painter: MazePainterStyled(
                           mazeRows: widget.mazeRows,
