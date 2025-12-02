@@ -2,7 +2,7 @@ name: Deploy Flutter Web to CapRover
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master" ]  # promijeni ako tvoj branch nije master
 
 jobs:
   deploy:
@@ -31,3 +31,4 @@ jobs:
         run: |
           caprover login --caproverUrl $CAPROVER_URL --password $CAPROVER_PASSWORD --saveToFile
           caprover deploy --tarFile ./build/web --appName $CAPROVER_APP
+
