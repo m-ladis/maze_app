@@ -126,70 +126,75 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           child: BackdropFilter(
             filter: ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: AppBar(
+              iconTheme: const IconThemeData(
+                color: Colors.white,
+              ),
               backgroundColor: const Color(0xFF3A4F75).withOpacity(0.85),
               elevation: 0,
               centerTitle: true,
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset('assets/cat.png', height: 30),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "Maze Game",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1.1,
+              toolbarHeight: 70,
+              // <— KLJUČNO: određuje stvarnu visinu AppBara
+
+              title: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                // ↑ lagano podesi vertikalno da bude savršeno poravnato
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset('assets/cat.png', height: 47),
+                    const SizedBox(width: 10),
+                    const Text(
+                      "Maze Game",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.1,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+
               actions: [
                 if (widget.hintEnabled)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: IconButton(
-                      icon: const Icon(Icons.lightbulb_rounded,
-                          color: Colors.yellowAccent),
-                      tooltip: "Show Hint",
-                      onPressed: () {
-                        var fastestWayOut = findFastestWayOut(
-                          widget.mazeRows,
-                          widget.mazeColumns,
-                          widget.playerPositionCell,
-                          widget.mazeGenerator.mazeCells,
-                        );
-                        setState(() {
-                          widget.hint =
-                              calculateHint(fastestWayOut.toList()).toList();
-                          _pawsController.forward(from: 0); // restart animacije
-                        });
-                      },
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: IconButton(
-                    icon: const Icon(Icons.replay, color: Colors.white),
-                    tooltip: "Restart Maze",
+                  IconButton(
+                    icon: const Icon(Icons.lightbulb_rounded,
+                        color: Colors.orange),
+                    tooltip: "Show Hint",
                     onPressed: () {
+                      var fastestWayOut = findFastestWayOut(
+                        widget.mazeRows,
+                        widget.mazeColumns,
+                        widget.playerPositionCell,
+                        widget.mazeGenerator.mazeCells,
+                      );
                       setState(() {
-                        widget.mazeGenerator.generate();
-                        widget.playerPositionCell.a = 0;
-                        widget.playerPositionCell.b = 0;
-                        widget.mousePositionCell = Pair(
-                            widget.rand.nextInt(widget.mazeRows - 1) + 1,
-                            widget.rand.nextInt(widget.mazeColumns - 1) + 1);
-                        widget.hint.clear();
+                        widget.hint =
+                            calculateHint(fastestWayOut.toList()).toList();
+                        _pawsController.forward(from: 0);
                       });
-                      if (widget.mouseEnabled) {
-                        widget.mazeGenerator.closeDoors();
-                      } else {
-                        widget.mazeGenerator.openDoors();
-                      }
                     },
                   ),
+                IconButton(
+                  icon: const Icon(Icons.replay, color: Colors.white),
+                  tooltip: "Restart Maze",
+                  onPressed: () {
+                    setState(() {
+                      widget.mazeGenerator.generate();
+                      widget.playerPositionCell.a = 0;
+                      widget.playerPositionCell.b = 0;
+                      widget.mousePositionCell = Pair(
+                          widget.rand.nextInt(widget.mazeRows - 1) + 1,
+                          widget.rand.nextInt(widget.mazeColumns - 1) + 1);
+                      widget.hint.clear();
+                    });
+                    if (widget.mouseEnabled) {
+                      widget.mazeGenerator.closeDoors();
+                    } else {
+                      widget.mazeGenerator.openDoors();
+                    }
+                  },
                 ),
               ],
             ),
@@ -434,7 +439,7 @@ class MazePainterStyled extends CustomPainter {
     final double scaledOutline = min(cellSize, 30);
     final double scaledCornerRadius = min(cellSize, 22);
 
-    final Paint backgroundPaint = Paint()..color = const Color(0xFFF6EDE0);
+    final Paint backgroundPaint = Paint()..color = const Color(0xffB8CAE6);
     final Paint outerRoundedCornerPaint = Paint()
       ..color = const Color(0xFFFFFEF2)
       ..style = PaintingStyle.stroke
@@ -705,14 +710,19 @@ class PawHintPainterAnimated extends CustomPainter {
         canvas.translate(centerX, centerY);
         canvas.rotate(rotation);
         canvas.drawImageRect(
-            pawImage,
-            Rect.fromLTWH(
-                0, 0, pawImage.width.toDouble(), pawImage.height.toDouble()),
-            Rect.fromCenter(
-                center: const Offset(0, 0),
-                width: pawImage.width.toDouble() * scale,
-                height: pawImage.height.toDouble() * scale),
-            Paint());
+          pawImage,
+          Rect.fromLTWH(
+              0, 0, pawImage.width.toDouble(), pawImage.height.toDouble()),
+          Rect.fromCenter(
+              center: const Offset(0, 0),
+              width: pawImage.width.toDouble() * scale,
+              height: pawImage.height.toDouble() * scale),
+          Paint()
+            ..colorFilter = const ColorFilter.mode(
+              Color(0xFFFFFEF2),
+              BlendMode.srcIn,
+            ),
+        );
         canvas.restore();
       }
     }
