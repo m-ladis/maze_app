@@ -1,4 +1,3 @@
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -15,6 +14,7 @@ void main() {
 class MousePaw {
   Offset position;
   double opacity;
+
   MousePaw(this.position) : opacity = 1.0;
 }
 
@@ -22,6 +22,7 @@ class Snowflake {
   Offset position;
   double size;
   double speed;
+
   Snowflake(this.position, this.size, this.speed);
 }
 
@@ -99,9 +100,11 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
     )..addListener(() {
         setState(() {
           for (var flake in snowflakes) {
-            flake.position = Offset(flake.position.dx, flake.position.dy + flake.speed);
+            flake.position =
+                Offset(flake.position.dx, flake.position.dy + flake.speed);
             if (flake.position.dy > MediaQuery.of(context).size.height) {
-              flake.position = Offset(random.nextDouble() * MediaQuery.of(context).size.width, 0);
+              flake.position = Offset(
+                  random.nextDouble() * MediaQuery.of(context).size.width, 0);
             }
           }
         });
@@ -115,24 +118,24 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
     if (!_snowInitialized) {
       final screenSize = MediaQuery.of(context).size;
 
-        // Dinamički broj pahulja prema širini ekrana
-        int snowCount = (screenSize.width / 10).clamp(30, 100).toInt();
+      // Dinamički broj pahulja prema širini ekrana
+      int snowCount = (screenSize.width / 10).clamp(30, 100).toInt();
 
-        // Brzina snijega – sporija i fiksna
-        double snowMinSpeed = 0.3;
-        double snowMaxSpeed = 0.8;
+      // Brzina snijega – sporija i fiksna
+      double snowMinSpeed = 0.3;
+      double snowMaxSpeed = 0.8;
 
-        for (int i = 0; i < snowCount; i++) {
-          snowflakes.add(
-            Snowflake(
-              Offset(random.nextDouble() * screenSize.width,
-                     random.nextDouble() * screenSize.height),
-              4 + random.nextDouble() * 6,
-              snowMinSpeed + random.nextDouble() * (snowMaxSpeed - snowMinSpeed),
-            ),
-          );
-        }
-        _snowInitialized = true;
+      for (int i = 0; i < snowCount; i++) {
+        snowflakes.add(
+          Snowflake(
+            Offset(random.nextDouble() * screenSize.width,
+                random.nextDouble() * screenSize.height),
+            4 + random.nextDouble() * 6,
+            snowMinSpeed + random.nextDouble() * (snowMaxSpeed - snowMinSpeed),
+          ),
+        );
+      }
+      _snowInitialized = true;
     }
   }
 
@@ -147,9 +150,9 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   }
 
   void _jumpCat() async {
+    audioPlayer.play(AssetSource('sounds/meow.wav')); // dodaj svoj zvuk
     await catJumpController.forward(from: 0.0);
     await catJumpController.reverse();
-    // audioPlayer.play(AssetSource('sounds/meow.wav')); // dodaj svoj zvuk
   }
 
   @override
@@ -157,218 +160,204 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: MouseRegion(
-        onHover: (event) {
-          final now = DateTime.now();
-          if (now.difference(lastPawTime).inMilliseconds > pawCooldownMs) {
-            setState(() {
-              mousePaws.add(MousePaw(event.localPosition));
-              if (mousePaws.length > 10) mousePaws.removeAt(0);
-            });
-            lastPawTime = now;
-          }
-        },
-        child: Stack(
-          children: [
-            // Pozadina
-            Container(color: const Color(0xFF3A4F75)),
+      body: Stack(
+        children: [
+          // Pozadina
+          Container(color: const Color(0xFF3A4F75)),
 
-            // Snijeg
-            ...snowflakes.map((flake) {
-              return Positioned(
-                left: flake.position.dx,
-                top: flake.position.dy,
-                child: Container(
-                  width: flake.size,
-                  height: flake.size,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
-                    shape: BoxShape.circle,
-                  ),
+          // Snijeg
+          ...snowflakes.map((flake) {
+            return Positioned(
+              left: flake.position.dx,
+              top: flake.position.dy,
+              child: Container(
+                width: flake.size,
+                height: flake.size,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  shape: BoxShape.circle,
                 ),
-              );
-            }),
+              ),
+            );
+          }),
 
-            // Animirane šapice
-            AnimatedBuilder(
-              animation: pawController,
-              builder: (context, child) {
-                // Broj šapica raste s ekranom, ali umjereno
-                int dynamicPawCount = (screenSize.width / 30).clamp(40, 60).toInt();
-                // Veličina šapica također umjereno raste
-                double pawBaseSize = (screenSize.width / 40).clamp(34, 45);
+          // Animirane šapice
+          AnimatedBuilder(
+            animation: pawController,
+            builder: (context, child) {
+              // Broj šapica raste s ekranom, ali umjereno
+              int dynamicPawCount =
+                  (screenSize.width / 30).clamp(40, 60).toInt();
+              // Veličina šapica također umjereno raste
+              double pawBaseSize = (screenSize.width / 40).clamp(34, 45);
 
-                // Dodaj nove šapice ako ih nema dovoljno
-                while (pawPositions.length < dynamicPawCount) {
-                  pawPositions.add(
-                    Offset(random.nextDouble() * 0.9, random.nextDouble() * 0.9),
-                  );
-                }
+              // Dodaj nove šapice ako ih nema dovoljno
+              while (pawPositions.length < dynamicPawCount) {
+                pawPositions.add(
+                  Offset(random.nextDouble() * 0.9, random.nextDouble() * 0.9),
+                );
+              }
 
-                return Stack(
-                  children: List.generate(dynamicPawCount, (index) {
-                    final anim = pawController.value;
-                    final fade = (sin(anim * 2 * pi + index) + 1) / 2;
+              return Stack(
+                children: List.generate(dynamicPawCount, (index) {
+                  final anim = pawController.value;
+                  final fade = (sin(anim * 2 * pi + index) + 1) / 2;
 
-                    return Positioned(
-                      top: pawPositions[index].dy * screenSize.height,
-                      left: pawPositions[index].dx * screenSize.width,
-                      child: Opacity(
-                        opacity: fade * 0.7,
-                        child: Transform.scale(
-                          scale: 0.6 + fade * 0.4,
-                          child: Transform.rotate(
-                            angle: (index * 0.3) + anim * 0.3,
-                            child: Image.asset(
-                              "assets/paw.png",
-                              width: pawBaseSize,
-                              height: pawBaseSize,
-                            ),
+                  return Positioned(
+                    top: pawPositions[index].dy * screenSize.height,
+                    left: pawPositions[index].dx * screenSize.width,
+                    child: Opacity(
+                      opacity: fade * 0.7,
+                      child: Transform.scale(
+                        scale: 0.6 + fade * 0.4,
+                        child: Transform.rotate(
+                          angle: (index * 0.3) + anim * 0.3,
+                          child: Image.asset(
+                            "assets/paw.png",
+                            color: const Color.fromRGBO(238, 178, 109, 0.7),
+                            width: pawBaseSize,
+                            height: pawBaseSize,
                           ),
                         ),
                       ),
-                    );
-                  }),
-                );
-              },
-            ),
-
-
-
-            // Šapice po mišu
-            ...mousePaws.map((paw) {
-              return Positioned(
-                top: paw.position.dy - 10,
-                left: paw.position.dx - 10,
-                child: Image.asset(
-                  "assets/paw.png",
-                  width: 20,
-                  height: 20,
-                  color: Colors.black.withOpacity(paw.opacity),
-                ),
+                    ),
+                  );
+                }),
               );
-            }).toList(),
+            },
+          ),
 
-            // Centralni UI
-            Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  MouseRegion(
-                    onEnter: (_) => setState(() => isCatHovered = true),
-                    onExit: (_) => setState(() => isCatHovered = false),
-                    child: GestureDetector(
-                      onTap: _jumpCat,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Glow
-                          if (isCatHovered)
-                            Image.asset(
-                              'assets/cat.png',
-                              height: 180,
-                              color: Colors.yellow.withOpacity(0.08),
-                              colorBlendMode: BlendMode.modulate,
-                            ),
+          // Šapice po mišu
+          ...mousePaws.map((paw) {
+            return Positioned(
+              top: paw.position.dy - 10,
+              left: paw.position.dx - 10,
+              child: Image.asset(
+                "assets/paw.png",
+                width: 20,
+                height: 20,
+                color: Colors.black.withOpacity(paw.opacity),
+              ),
+            );
+          }).toList(),
 
-                          // Mačka
-                          AnimatedBuilder(
-                            animation: catJumpAnimation,
-                            builder: (context, child) {
-                              final offsetY = -catJumpAnimation.value * 50;
-                              final scale = 1.0 + (isCatHovered ? 0.05 : 0.0);
-                              return Transform.translate(
-                                offset: Offset(0, offsetY),
-                                child: Transform.scale(
-                                  scale: scale,
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: Image.asset(
-                              "assets/cat.png",
-                              height: 180,
-                            ),
+          // Centralni UI
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MouseRegion(
+                  onEnter: (_) => setState(() => isCatHovered = true),
+                  onExit: (_) => setState(() => isCatHovered = false),
+                  child: GestureDetector(
+                    onTap: _jumpCat,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Glow
+                        if (isCatHovered)
+                          Image.asset(
+                            'assets/cat.png',
+                            height: 180,
+                            color: Colors.yellow.withOpacity(0.08),
+                            colorBlendMode: BlendMode.modulate,
                           ),
-                        ],
-                      ),
+
+                        // Mačka
+                        AnimatedBuilder(
+                          animation: catJumpAnimation,
+                          builder: (context, child) {
+                            final offsetY = -catJumpAnimation.value * 50;
+                            final scale = 1.0 + (isCatHovered ? 0.05 : 0.0);
+                            return Transform.translate(
+                              offset: Offset(0, offsetY),
+                              child: Transform.scale(
+                                scale: scale,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            "assets/cat.png",
+                            height: 180,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: 30),
-
-                  HoverButton(
-                    text: 'Easy',
-                    color: Color(0xFF7EE47A),
-                    width: 180,
-                    height: 50,
-                    onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => MyHomePage(
-                                                title: 'Maze App',
-                                                mazeColumns: getCellsForDifficulty(Difficulty.easy).a,
-                                                mazeRows: getCellsForDifficulty(Difficulty.easy).b,
-                                                hintEnabled: true,
-                                                mouseEnabled: false,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                  ),
-                  const SizedBox(height: 15),
-                  HoverButton(
-                    text: 'Normal',
-                    color: Color(0xFFFF9F4E),
-                    width: 180,
-                    height: 50,
-                    onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => MyHomePage(
-                                                title: 'Maze App',
-                                                mazeColumns: getCellsForDifficulty(Difficulty.normal).a,
-                                                mazeRows: getCellsForDifficulty(Difficulty.normal).b,
-                                                hintEnabled: true,
-                                                mouseEnabled: false,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                  ),
-                  const SizedBox(height: 15),
-                  HoverButton(
-                    text: 'Hard',
-                    color: Color(0xFFE55050),
-                    width: 180,
-                    height: 50,
-                    onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => MyHomePage(
-                                                title: 'Maze App',
-                                                mazeColumns: getCellsForDifficulty(Difficulty.hard).a,
-                                                mazeRows: getCellsForDifficulty(Difficulty.hard).b,
-                                                hintEnabled: false,
-                                                mouseEnabled: true,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 30),
+                HoverButton(
+                  text: 'Easy',
+                  color: Color(0xFF7EE47A),
+                  width: 180,
+                  height: 50,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                          title: 'Maze App',
+                          mazeColumns: getCellsForDifficulty(Difficulty.easy).a,
+                          mazeRows: getCellsForDifficulty(Difficulty.easy).b,
+                          hintEnabled: true,
+                          mouseEnabled: false,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 15),
+                HoverButton(
+                  text: 'Normal',
+                  color: Color(0xFFFF9F4E),
+                  width: 180,
+                  height: 50,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                          title: 'Maze App',
+                          mazeColumns:
+                              getCellsForDifficulty(Difficulty.normal).a,
+                          mazeRows: getCellsForDifficulty(Difficulty.normal).b,
+                          hintEnabled: true,
+                          mouseEnabled: false,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 15),
+                HoverButton(
+                  text: 'Hard',
+                  color: Color(0xFFE55050),
+                  width: 180,
+                  height: 50,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                          title: 'Maze App',
+                          mazeColumns: getCellsForDifficulty(Difficulty.hard).a,
+                          mazeRows: getCellsForDifficulty(Difficulty.hard).b,
+                          hintEnabled: false,
+                          mouseEnabled: true,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
-
 
 // Hover dugme
 class HoverButton extends StatefulWidget {
@@ -432,17 +421,6 @@ class _HoverButtonState extends State<HoverButton> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 //
 // import 'dart:math';
@@ -813,24 +791,6 @@ class _HoverButtonState extends State<HoverButton> {
 //   }
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //
 // import 'dart:math';
 // import 'package:flutter/material.dart';
@@ -1036,12 +996,6 @@ class _HoverButtonState extends State<HoverButton> {
 //   }
 // }
 
-
-
-
-
-
-
 //
 // import 'package:flutter/material.dart';
 // import 'package:maze_app/model/difficulty.dart';
@@ -1169,4 +1123,3 @@ class _HoverButtonState extends State<HoverButton> {
 //     );
 //   }
 // }
-
