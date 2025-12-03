@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -71,6 +72,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late ui.Image bowlImage;
   late ui.Image yarnBallImage;
   bool imageLoaded = false;
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -119,7 +121,12 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void dispose() {
     _playerPulseController.dispose();
     _pawsController.dispose();
+    audioPlayer.dispose();
     super.dispose();
+  }
+
+  void startDrinkingMilk() async {
+    audioPlayer.play(AssetSource('sounds/cat_drinking.mp3'));
   }
 
   @override
@@ -376,6 +383,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         widget.mazeGenerator.openDoors();
       }
       if (widget.playerPositionCell.b >= widget.mazeColumns) {
+        startDrinkingMilk();
         showDialog(
             barrierDismissible: false,
             context: context,
