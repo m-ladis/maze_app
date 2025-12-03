@@ -144,26 +144,24 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   padding: const EdgeInsets.only(top: 8),
                   child: Row(
                     children: [
-                      Image.asset('assets/cat.png', height: 47),
-                      const SizedBox(width: 10),
-
                       // 🔥 OVO JE KLJUČ
                       Expanded(
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             return FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Maze Game",
-                                style: GoogleFonts.rubikPuddles(
-                                  fontSize: 33,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 1.1,
-                                ),
-                              ),
-                            );
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.center,
+                                child: Row(children: [
+                                  Image.asset('assets/cat.png', height: 47),
+                                  const SizedBox(width: 10),
+                                  Text("Maze Game",
+                                      style: GoogleFonts.rubikPuddles(
+                                        fontSize: 33,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: 1.1,
+                                      ))
+                                ]));
                           },
                         ),
                       ),
@@ -689,7 +687,6 @@ class MousePainterStyled extends CustomPainter {
 
     double centerX = mousePositionCell.a * cellSize + cellSize / 2 + offsetX;
     double centerY = mousePositionCell.b * cellSize + cellSize / 2 + offsetY;
-    double radius = cellSize / 3;
 
     canvas.drawImageRect(
         yarnBallImage,
