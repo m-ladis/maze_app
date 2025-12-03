@@ -355,12 +355,17 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     child: ConfettiWidget(
                                       confettiController: _confettiController,
                                       blastDirectionality: BlastDirectionality.explosive,
-                                      shouldLoop: false,
-                                      colors: const [
-                                        Colors.red, Colors.blue, Colors.green, Colors.orange, Colors.purple
-                                      ],
+                                      numberOfParticles: 60,        // više konfeta
+                                      emissionFrequency: 0.05,      // brža emisija
+                                      maxBlastForce: 30,            // jači “explosion”
+                                      minBlastForce: 10,
+                                      gravity: 0.3,                 // realističniji pad
+                                      particleDrag: 0.05,
                                     ),
-                                  )
+                                  ),
+
+
+
                           ],
                         );
                       },
