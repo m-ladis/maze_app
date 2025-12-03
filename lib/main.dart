@@ -407,19 +407,58 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               barrierDismissible: false,
               context: context,
               builder: (BuildContext context) => AlertDialog(
-                title: const Text("Congratulations"),
-                content: const Text("You saved the cat!"),
+                backgroundColor: const Color(0xFFE7EEF8), // svijetla hladno-plava (usklađena s B8CAE6)
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                title: const Text(
+                  "Congratulations",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF3A4F75), // tvoja tamno plava
+                  ),
+                ),
+                content: const Text(
+                  "You guided the cat to her milk — she’s purring with joy!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF3A4F75), // isto tamno plava
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                actionsAlignment: MainAxisAlignment.center,
+
                 actions: [
                   ElevatedButton(
-                    child: const Text("Play again"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3A4F75), // tvoja glavna tamno plava
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 22,
+                        vertical: 10,
+                      ),
+                      elevation: 0,
+                    ),
                     onPressed: () {
                       Navigator.pop(context);
                       Navigator.pop(context);
                     },
+                    child: Text(
+                      "Play again",
+                      style: GoogleFonts.dynaPuff(),
+                    ),
                   ),
                 ],
               ),
             );
+
           });
       }
     });
