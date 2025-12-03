@@ -10,7 +10,7 @@ import 'package:maze_app/model/path_finder.dart';
 
 import 'animations.dart';
 
-const mazePadding = 20.0;    
+const mazePadding = 20.0;
 
 void main() {
   runApp(const MyApp());
@@ -121,194 +121,218 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
-        child: ClipRRect(
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: AppBar(
-              iconTheme: const IconThemeData(
-                color: Colors.white,
-              ),
-              backgroundColor: const Color(0xFF3A4F75),
-              elevation: 0,
-              centerTitle: true,
-              toolbarHeight: 70,
-              // <— KLJUČNO: određuje stvarnu visinu AppBara
-
-              title: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                // ↑ lagano podesi vertikalno da bude savršeno poravnato
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset('assets/cat.png', height: 47),
-                    const SizedBox(width: 10),
-                    Text(
-                      "Maze Game",
-                      style: GoogleFonts.rubikPuddles(
-                        fontSize: 33,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                  ],
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: ClipRRect(
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: AppBar(
+                iconTheme: const IconThemeData(
+                  color: Colors.white,
                 ),
-              ),
+                backgroundColor: const Color(0xFF3A4F75),
+                elevation: 0,
+                centerTitle: true,
+                toolbarHeight: 70,
+                // <— KLJUČNO: određuje stvarnu visinu AppBara
 
-              actions: [
-                if (widget.hintEnabled)
+                title: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  // ↑ lagano podesi vertikalno da bude savršeno poravnato
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset('assets/cat.png', height: 47),
+                      const SizedBox(width: 10),
+                      Text(
+                        "Maze Game",
+                        style: GoogleFonts.rubikPuddles(
+                          fontSize: 33,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                actions: [
+                  if (widget.hintEnabled)
+                    IconButton(
+                      icon: const Icon(Icons.lightbulb_rounded,
+                          color: Colors.orange),
+                      tooltip: "Show Hint",
+                      onPressed: () {
+                        var fastestWayOut = findFastestWayOut(
+                          widget.mazeRows,
+                          widget.mazeColumns,
+                          widget.playerPositionCell,
+                          widget.mazeGenerator.mazeCells,
+                        );
+                        setState(() {
+                          widget.hint =
+                              calculateHint(fastestWayOut.toList()).toList();
+                          _pawsController.forward(from: 0);
+                        });
+                      },
+                    ),
                   IconButton(
-                    icon: const Icon(Icons.lightbulb_rounded,
-                        color: Colors.orange),
-                    tooltip: "Show Hint",
+                    icon: const Icon(Icons.replay, color: Colors.white),
+                    tooltip: "Restart Maze",
                     onPressed: () {
-                      var fastestWayOut = findFastestWayOut(
-                        widget.mazeRows,
-                        widget.mazeColumns,
-                        widget.playerPositionCell,
-                        widget.mazeGenerator.mazeCells,
-                      );
                       setState(() {
-                        widget.hint =
-                            calculateHint(fastestWayOut.toList()).toList();
-                        _pawsController.forward(from: 0);
+                        widget.mazeGenerator.generate();
+                        widget.playerPositionCell.a = 0;
+                        widget.playerPositionCell.b = 0;
+                        widget.mousePositionCell = Pair(
+                            widget.rand.nextInt(widget.mazeRows - 1) + 1,
+                            widget.rand.nextInt(widget.mazeColumns - 1) + 1);
+                        widget.hint.clear();
                       });
+                      if (widget.mouseEnabled) {
+                        widget.mazeGenerator.closeDoors();
+                      } else {
+                        widget.mazeGenerator.openDoors();
+                      }
                     },
                   ),
-                IconButton(
-                  icon: const Icon(Icons.replay, color: Colors.white),
-                  tooltip: "Restart Maze",
-                  onPressed: () {
-                    setState(() {
-                      widget.mazeGenerator.generate();
-                      widget.playerPositionCell.a = 0;
-                      widget.playerPositionCell.b = 0;
-                      widget.mousePositionCell = Pair(
-                          widget.rand.nextInt(widget.mazeRows - 1) + 1,
-                          widget.rand.nextInt(widget.mazeColumns - 1) + 1);
-                      widget.hint.clear();
-                    });
-                    if (widget.mouseEnabled) {
-                      widget.mazeGenerator.closeDoors();
-                    } else {
-                      widget.mazeGenerator.openDoors();
-                    }
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      body: Container(
-        color: const Color(0xFF3A4F75),
-        child: Center(
-          child: MazeGeasture(
-              moveLeft: _moveLeft,
-              moveUp: _moveUp,
-              moveRight: _moveRight,
-              moveDown: _moveDown,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  const double maxOutline =
-                      30.0; // margin za pozadinu labirinta
-
-                  // dostupna širina i visina za labirint
-                  double availableWidth =
-                      constraints.maxWidth - mazePadding * 2 - maxOutline * 2;
-                  double availableHeight =
-                      constraints.maxHeight - mazePadding * 2 - maxOutline * 8;
-
-                  // izračun veličine ćelije tako da cijeli labirint stane unutar ekrana
-                  double cellWidth = availableWidth / widget.mazeRows;
-                  double cellHeight = availableHeight / widget.mazeColumns;
-                  double cellSize = min(cellWidth, cellHeight);
-
-                  // dimenzije labirinta
-                  double mazeWidth = widget.mazeRows * cellSize;
-                  double mazeHeight = widget.mazeColumns * cellSize;
-
-                  // centriranje labirinta
-                  double offsetX = (constraints.maxWidth - mazeWidth) / 2;
-                  double offsetY =
-                      (constraints.maxHeight - mazeHeight) / 2 - cellSize / 2;
-
-                  return Stack(
-                    children: [
-                      const AnimatedBackground(), // Šapice + Snijeg
-                      CustomPaint(
-                        painter: MazePainterStyled(
-                          mazeRows: widget.mazeRows,
-                          mazeColumns: widget.mazeColumns,
-                          mazeCells: widget.mazeGenerator.mazeCells
-                              .cast<List<MazeCell>>(),
-                          cellSize: cellSize,
-                          offsetX: offsetX,
-                          offsetY: offsetY,
-                        ),
-                        size: Size(constraints.maxWidth, constraints.maxHeight),
-                      ),
-                      if (imageLoaded)
-                        AnimatedBuilder(
-                          animation: _playerPulseController,
-                          builder: (context, child) {
-                            return CustomPaint(
-                              painter: PlayerPainterStyled(
-                                mazeRows: widget.mazeRows,
-                                mazeColumns: widget.mazeColumns,
-                                playerPositionCell: widget.playerPositionCell,
-                                scale: _playerPulseController.value,
-                                playerImage: playerImage,
-                                cellSize: cellSize,
-                                offsetX: offsetX,
-                                offsetY: offsetY,
-                              ),
-                              size: Size(
-                                  constraints.maxWidth, constraints.maxHeight),
-                            );
-                          },
-                        ),
-                      CustomPaint(
-                        painter: MousePainterStyled(
-                          mazeRows: widget.mazeRows,
-                          mazeColumns: widget.mazeColumns,
-                          mousePositionCell: widget.mousePositionCell,
-                          isEnabled: widget.mouseEnabled,
-                          cellSize: cellSize,
-                          offsetX: offsetX,
-                          offsetY: offsetY,
-                        ),
-                        size: Size(constraints.maxWidth, constraints.maxHeight),
-                      ),
-                      if (imageLoaded)
-                        AnimatedBuilder(
-                          animation: _pawsController,
-                          builder: (context, child) {
-                            return CustomPaint(
-                              painter: PawHintPainterAnimated(
-                                mazeRows: widget.mazeRows,
-                                mazeColumns: widget.mazeColumns,
-                                pawsLocation: widget.hint.toList(),
-                                pawImage: pawImage,
-                                progress: _pawsController.value,
-                                cellSize: cellSize,
-                                offsetX: offsetX,
-                                offsetY: offsetY,
-                              ),
-                              size: Size(
-                                  constraints.maxWidth, constraints.maxHeight),
-                            );
-                          },
-                        ),
-                    ],
-                  );
+        body: Container(
+            color: const Color(0xFF3A4F75),
+            child: Center(
+              child: RawKeyboardListener(
+                focusNode: FocusNode(),
+                autofocus: true,
+                onKey: (RawKeyEvent event) {
+                  if (event is RawKeyDownEvent) {
+                    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                      _moveLeft();
+                    } else if (event.logicalKey ==
+                        LogicalKeyboardKey.arrowRight) {
+                      _moveRight();
+                    } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                      _moveUp();
+                    } else if (event.logicalKey ==
+                        LogicalKeyboardKey.arrowDown) {
+                      _moveDown();
+                    }
+                  }
                 },
-              )),
-        ),
-      ),
-    );
+                child: MazeGeasture(
+                    moveLeft: _moveLeft,
+                    moveUp: _moveUp,
+                    moveRight: _moveRight,
+                    moveDown: _moveDown,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        const double maxOutline =
+                            30.0; // margin za pozadinu labirinta
+
+                        // dostupna širina i visina za labirint
+                        double availableWidth = constraints.maxWidth -
+                            mazePadding * 2 -
+                            maxOutline * 2;
+                        double availableHeight = constraints.maxHeight -
+                            mazePadding * 2 -
+                            maxOutline * 8;
+
+                        // izračun veličine ćelije tako da cijeli labirint stane unutar ekrana
+                        double cellWidth = availableWidth / widget.mazeRows;
+                        double cellHeight =
+                            availableHeight / widget.mazeColumns;
+                        double cellSize = min(cellWidth, cellHeight);
+
+                        // dimenzije labirinta
+                        double mazeWidth = widget.mazeRows * cellSize;
+                        double mazeHeight = widget.mazeColumns * cellSize;
+
+                        // centriranje labirinta
+                        double offsetX = (constraints.maxWidth - mazeWidth) / 2;
+                        double offsetY =
+                            (constraints.maxHeight - mazeHeight) / 2 -
+                                cellSize / 2;
+
+                        return Stack(
+                          children: [
+                            const AnimatedBackground(), // Šapice + Snijeg
+                            CustomPaint(
+                              painter: MazePainterStyled(
+                                mazeRows: widget.mazeRows,
+                                mazeColumns: widget.mazeColumns,
+                                mazeCells: widget.mazeGenerator.mazeCells
+                                    .cast<List<MazeCell>>(),
+                                cellSize: cellSize,
+                                offsetX: offsetX,
+                                offsetY: offsetY,
+                              ),
+                              size: Size(
+                                  constraints.maxWidth, constraints.maxHeight),
+                            ),
+                            if (imageLoaded)
+                              AnimatedBuilder(
+                                animation: _playerPulseController,
+                                builder: (context, child) {
+                                  return CustomPaint(
+                                    painter: PlayerPainterStyled(
+                                      mazeRows: widget.mazeRows,
+                                      mazeColumns: widget.mazeColumns,
+                                      playerPositionCell:
+                                          widget.playerPositionCell,
+                                      scale: _playerPulseController.value,
+                                      playerImage: playerImage,
+                                      cellSize: cellSize,
+                                      offsetX: offsetX,
+                                      offsetY: offsetY,
+                                    ),
+                                    size: Size(constraints.maxWidth,
+                                        constraints.maxHeight),
+                                  );
+                                },
+                              ),
+                            CustomPaint(
+                              painter: MousePainterStyled(
+                                mazeRows: widget.mazeRows,
+                                mazeColumns: widget.mazeColumns,
+                                mousePositionCell: widget.mousePositionCell,
+                                isEnabled: widget.mouseEnabled,
+                                cellSize: cellSize,
+                                offsetX: offsetX,
+                                offsetY: offsetY,
+                              ),
+                              size: Size(
+                                  constraints.maxWidth, constraints.maxHeight),
+                            ),
+                            if (imageLoaded)
+                              AnimatedBuilder(
+                                animation: _pawsController,
+                                builder: (context, child) {
+                                  return CustomPaint(
+                                    painter: PawHintPainterAnimated(
+                                      mazeRows: widget.mazeRows,
+                                      mazeColumns: widget.mazeColumns,
+                                      pawsLocation: widget.hint.toList(),
+                                      pawImage: pawImage,
+                                      progress: _pawsController.value,
+                                      cellSize: cellSize,
+                                      offsetX: offsetX,
+                                      offsetY: offsetY,
+                                    ),
+                                    size: Size(constraints.maxWidth,
+                                        constraints.maxHeight),
+                                  );
+                                },
+                              ),
+                          ],
+                        );
+                      },
+                    )),
+              ),
+            )));
   }
 
   void _moveLeft() => _movePlayer(-1, 0);
