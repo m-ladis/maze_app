@@ -29,6 +29,6 @@ jobs:
           CAPROVER_PASSWORD: ${{ secrets.CAPROVER_PASSWORD }}
           CAPROVER_APP: ${{ secrets.CAPROVER_APP }}
         run: |
-          caprover login --caproverUrl $CAPROVER_URL --password $CAPROVER_PASSWORD --saveToFile
+          caprover login --caproverUrl $CAPROVER_URL --password $CAPROVER_PASSWORD
           caprover deploy --tarFile ./build/web --appName $CAPROVER_APP
 
