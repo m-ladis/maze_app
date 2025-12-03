@@ -2,27 +2,37 @@ name: Deploy Flutter Web to CapRover
 
 on:
   push:
-    branches: [ "master" ]  # ili zamijeni sa svojim branch-om
+    branches: [ "master" ]  # zamijeni sa svojim branch-om ako treba
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2️⃣ Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
 
+      # 3️⃣ Build Flutter Web
       - name: Build Flutter Web
         run: flutter build web --release
 
+      # 4️⃣ Archive build folder
+      - name: Archive Flutter Web build
+        run: |
+          tar -czf build_web.tar.gz -C build web
+
+      # 5️⃣ Install CapRover CLI
       - name: Install CapRover CLI
         run: npm install -g caprover
 
+      # 6️⃣ Deploy to CapRover
       - name: Deploy to CapRover
         env:
           CAPROVER_URL: ${{ secrets.CAPROVER_URL }}
@@ -30,7 +40,7 @@ jobs:
           CAPROVER_APP: ${{ secrets.CAPROVER_APP }}
         run: |
           echo "Deploying Flutter Web to CapRover..."
-          # Direktno deploy, najnoviji CLI koristi CAPROVER_PASSWORD iz env var
-          caprover deploy --tarFile ./build/web --appName $CAPROVER_APP
+          caprover deploy --tarFile build_web.tar.gz --appName $CAPROVER_APP
+
 
 
