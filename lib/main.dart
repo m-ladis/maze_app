@@ -10,7 +10,7 @@ import 'package:maze_app/model/path_finder.dart';
 
 import 'animations.dart';
 
-const mazePadding = 20.0;
+const mazePadding = 20.0;    
 
 void main() {
   runApp(const MyApp());
