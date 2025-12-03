@@ -351,18 +351,18 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               ),
 
                               Align(
-                                    alignment: Alignment.topCenter,
-                                    child: ConfettiWidget(
-                                      confettiController: _confettiController,
-                                      blastDirectionality: BlastDirectionality.explosive,
-                                      numberOfParticles: 60,        // više konfeta
-                                      emissionFrequency: 0.05,      // brža emisija
-                                      maxBlastForce: 30,            // jači “explosion”
-                                      minBlastForce: 10,
-                                      gravity: 0.3,                 // realističniji pad
-                                      particleDrag: 0.05,
-                                    ),
-                                  ),
+                                alignment: Alignment.topCenter,
+                                child: ConfettiWidget(
+                                  confettiController: _confettiController,
+                                  blastDirectionality: BlastDirectionality.explosive,
+                                  numberOfParticles: 30,        // manje konfeta
+                                  emissionFrequency: 0.02,      // rjeđa emisija
+                                  maxBlastForce: 15,            // tiši "explosion"
+                                  minBlastForce: 5,
+                                  gravity: 0.1,                 // sporiji pad
+                                  particleDrag: 0.03,           // malo ublažava kretanje
+                                ),
+                              )
 
 
 
