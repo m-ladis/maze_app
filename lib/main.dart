@@ -8,7 +8,7 @@ import 'package:maze_app/main_menu.dart';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
 import 'package:maze_app/model/path_finder.dart';
-
+import 'package:confetti/confetti.dart';
 import 'animations.dart';
 
 const mazePadding = 20.0;
@@ -73,6 +73,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late ui.Image yarnBallImage;
   bool imageLoaded = false;
   final AudioPlayer audioPlayer = AudioPlayer();
+  late ConfettiController _confettiController;
 
   @override
   void initState() {
@@ -97,6 +98,8 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     )..forward();
 
     _loadImages();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+
   }
 
   void _loadImages() async {
@@ -122,6 +125,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     _playerPulseController.dispose();
     _pawsController.dispose();
     audioPlayer.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -350,6 +354,23 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   );
                                 },
                               ),
+
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: ConfettiWidget(
+                                  confettiController: _confettiController,
+                                  blastDirectionality: BlastDirectionality.explosive,
+                                  numberOfParticles: 30,        // manje konfeta
+                                  emissionFrequency: 0.02,      // rjeđa emisija
+                                  maxBlastForce: 15,            // tiši "explosion"
+                                  minBlastForce: 5,
+                                  gravity: 0.1,                 // sporiji pad
+                                  particleDrag: 0.03,           // malo ublažava kretanje
+                                ),
+                              )
+
+
+
                           ],
                         );
                       },
@@ -388,23 +409,67 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         widget.mazeGenerator.openDoors();
       }
       if (widget.playerPositionCell.b >= widget.mazeColumns) {
+        _confettiController.play();
         startDrinkingMilk();
-        showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-                  title: const Text("Congratulations"),
-                  content: const Text("You saved the cat!"),
-                  actions: [
-                    ElevatedButton(
-                      child: const Text("Play again"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      },
+        Future.delayed(const Duration(seconds: 4), () {
+
+            showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                backgroundColor: const Color(0xFFE7EEF8), // svijetla hladno-plava (usklađena s B8CAE6)
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                title: const Text(
+                  "Congratulations",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF3A4F75), // tvoja tamno plava
+                  ),
+                ),
+                content: const Text(
+                  "You guided the cat to her milk — she’s purring with joy!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF3A4F75), // isto tamno plava
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                actionsAlignment: MainAxisAlignment.center,
+
+                actions: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3A4F75), // tvoja glavna tamno plava
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 22,
+                        vertical: 10,
+                      ),
+                      elevation: 0,
                     ),
-                  ],
-                ));
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "Play again",
+                      style: GoogleFonts.dynaPuff(),
+                    ),
+                  ),
+                ],
+              ),
+            );
+
+          });
       }
     });
   }
