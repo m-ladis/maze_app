@@ -68,6 +68,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late AnimationController _pawsController;
   late ui.Image playerImage;
   late ui.Image pawImage;
+  late ui.Image bowlImage;
   bool imageLoaded = false;
 
   @override
@@ -96,6 +97,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   void _loadImages() async {
+    bowlImage = await loadImage('assets/bowl.png');
     playerImage = await loadImage('assets/cat.png');
     pawImage = await loadImage('assets/paw.png'); // stavi ispravnu putanju
     setState(() {
@@ -273,6 +275,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 cellSize: cellSize,
                                 offsetX: offsetX,
                                 offsetY: offsetY,
+                                bowlImage: bowlImage
                               ),
                               size: Size(
                                   constraints.maxWidth, constraints.maxHeight),
@@ -452,6 +455,7 @@ class MazePainterStyled extends CustomPainter {
   final double cellSize;
   final double offsetX;
   final double offsetY;
+  late ui.Image bowlImage;
 
   MazePainterStyled({
     required this.mazeRows,
@@ -460,6 +464,7 @@ class MazePainterStyled extends CustomPainter {
     required this.cellSize,
     required this.offsetX,
     required this.offsetY,
+    required this.bowlImage,
   });
 
   @override
@@ -590,6 +595,18 @@ class MazePainterStyled extends CustomPainter {
         if (!cell.wallDownOpened)
           canvas.drawLine(Offset(x, y + cellSize),
               Offset(x + cellSize, y + cellSize), wallPaint);
+        if(i == mazeRows - 1 && j == mazeColumns - 1) {
+          canvas.drawImageRect(
+            bowlImage,
+            Rect.fromLTWH(
+                0, 0, bowlImage.width.toDouble(), bowlImage.height.toDouble()),
+            Rect.fromCenter(
+                center: Offset(x + cellSize / 2, y + 4*cellSize / 2),
+                width: 3*cellSize * 1,
+                height: 2*cellSize* 1),
+            Paint()
+          );
+        }
       }
     }
   }
