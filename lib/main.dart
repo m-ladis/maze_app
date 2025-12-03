@@ -37,7 +37,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
   final int mazeRows;
   final int mazeColumns;
-  final bool hintEnabled;
+  bool hintEnabled;
   bool mouseEnabled;
   final Pair<int, int> playerPositionCell = Pair(0, 0);
   final rand = Random();
@@ -131,6 +131,10 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final hintIcon = (widget.hintEnabled)
+        ? const Icon(Icons.lightbulb_rounded, color: Colors.orange)
+        : const Icon(Icons.lightbulb_outline, color: Colors.white);
+
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(70),
@@ -176,25 +180,26 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   ),
                 ),
                 actions: [
-                  if (widget.hintEnabled)
-                    IconButton(
-                      icon: const Icon(Icons.lightbulb_rounded,
-                          color: Colors.orange),
-                      tooltip: "Show Hint",
-                      onPressed: () {
-                        var fastestWayOut = findFastestWayOut(
-                          widget.mazeRows,
-                          widget.mazeColumns,
-                          widget.playerPositionCell,
-                          widget.mazeGenerator.mazeCells,
-                        );
-                        setState(() {
+                  IconButton(
+                    icon: hintIcon,
+                    tooltip: "Show Hint",
+                    onPressed: () {
+                      var fastestWayOut = findFastestWayOut(
+                        widget.mazeRows,
+                        widget.mazeColumns,
+                        widget.playerPositionCell,
+                        widget.mazeGenerator.mazeCells,
+                      );
+                      setState(() {
+                        if (widget.hintEnabled) {
+                          widget.hintEnabled = false;
                           widget.hint =
                               calculateHint(fastestWayOut.toList()).toList();
                           _pawsController.forward(from: 0);
-                        });
-                      },
-                    ),
+                        }
+                      });
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.replay, color: Colors.white),
                     tooltip: "Restart Maze",
