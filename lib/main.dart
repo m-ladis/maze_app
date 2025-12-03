@@ -139,22 +139,26 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 title: Padding(
                   padding: const EdgeInsets.only(top: 8),
                   // ↑ lagano podesi vertikalno da bude savršeno poravnato
-                  child: Row(
+                  child: Flexible(
+                      child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset('assets/cat.png', height: 47),
                       const SizedBox(width: 10),
-                      Text(
-                        "Maze Game",
-                        style: GoogleFonts.rubikPuddles(
-                          fontSize: 33,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
+                      Flexible(
+                          child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "Maze Game",
+                                style: GoogleFonts.rubikPuddles(
+                                  fontSize: 33,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 1.1,
+                                ),
+                              )))
                     ],
-                  ),
+                  )),
                 ),
 
                 actions: [
