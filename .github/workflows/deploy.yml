@@ -2,7 +2,7 @@ name: Deploy Flutter Web to CapRover
 
 on:
   push:
-    branches: [ "master" ]  # zamijeni sa svojim branch-om ako treba
+    branches: [ "master" ]  # zamijeni ako koristiš drugi branch
 
 jobs:
   deploy:
@@ -23,10 +23,10 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web --release
 
-      # 4️⃣ Archive build folder
-      - name: Archive Flutter Web build
+      # 4️⃣ Archive build folder + captain-definition
+      - name: Archive Flutter Web build + Captain Definition
         run: |
-          tar -czf build_web.tar.gz -C build web
+          tar -czf build_web_with_captain.tar.gz captain-definition build/web
 
       # 5️⃣ Install CapRover CLI
       - name: Install CapRover CLI
@@ -40,7 +40,8 @@ jobs:
           CAPROVER_APP: ${{ secrets.CAPROVER_APP }}
         run: |
           echo "Deploying Flutter Web to CapRover..."
-          caprover deploy --tarFile build_web.tar.gz --appName $CAPROVER_APP
+          caprover deploy --tarFile build_web_with_captain.tar.gz --appName $CAPROVER_APP
+
 
 
 
