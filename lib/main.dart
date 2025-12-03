@@ -8,7 +8,7 @@ import 'package:maze_app/main_menu.dart';
 import 'package:maze_app/model/maze_cell.dart';
 import 'package:maze_app/model/maze_generator.dart';
 import 'package:maze_app/model/path_finder.dart';
-
+import 'package:confetti/confetti.dart';
 import 'animations.dart';
 
 const mazePadding = 20.0;
@@ -73,6 +73,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late ui.Image yarnBallImage;
   bool imageLoaded = false;
   final AudioPlayer audioPlayer = AudioPlayer();
+  late ConfettiController _confettiController;
 
   @override
   void initState() {
@@ -97,6 +98,8 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     )..forward();
 
     _loadImages();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+
   }
 
   void _loadImages() async {
@@ -122,6 +125,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     _playerPulseController.dispose();
     _pawsController.dispose();
     audioPlayer.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -345,6 +349,18 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   );
                                 },
                               ),
+
+                              Align(
+                                    alignment: Alignment.topCenter,
+                                    child: ConfettiWidget(
+                                      confettiController: _confettiController,
+                                      blastDirectionality: BlastDirectionality.explosive,
+                                      shouldLoop: false,
+                                      colors: const [
+                                        Colors.red, Colors.blue, Colors.green, Colors.orange, Colors.purple
+                                      ],
+                                    ),
+                                  )
                           ],
                         );
                       },
@@ -383,23 +399,28 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         widget.mazeGenerator.openDoors();
       }
       if (widget.playerPositionCell.b >= widget.mazeColumns) {
+        _confettiController.play();
         startDrinkingMilk();
-        showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-                  title: const Text("Congratulations"),
-                  content: const Text("You saved the cat!"),
-                  actions: [
-                    ElevatedButton(
-                      child: const Text("Play again"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
+        Future.delayed(const Duration(seconds: 4), () {
+
+            showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text("Congratulations"),
+                content: const Text("You saved the cat!"),
+                actions: [
+                  ElevatedButton(
+                    child: const Text("Play again"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+          });
       }
     });
   }
