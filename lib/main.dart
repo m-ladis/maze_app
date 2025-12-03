@@ -140,16 +140,18 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
                 title: Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  // ↑ lagano podesi vertikalno da bude savršeno poravnato
-                  child: Flexible(
-                      child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Row(
                     children: [
                       Image.asset('assets/cat.png', height: 47),
                       const SizedBox(width: 10),
-                      Flexible(
-                          child: FittedBox(
+
+                      // 🔥 OVO JE KLJUČ
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return FittedBox(
                               fit: BoxFit.scaleDown,
+                              alignment: Alignment.center,
                               child: Text(
                                 "Maze Game",
                                 style: GoogleFonts.rubikPuddles(
@@ -158,11 +160,14 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   fontWeight: FontWeight.w500,
                                   letterSpacing: 1.1,
                                 ),
-                              )))
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ],
-                  )),
+                  ),
                 ),
-
                 actions: [
                   if (widget.hintEnabled)
                     IconButton(
@@ -268,15 +273,14 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             const AnimatedBackground(), // Šapice + Snijeg
                             CustomPaint(
                               painter: MazePainterStyled(
-                                mazeRows: widget.mazeRows,
-                                mazeColumns: widget.mazeColumns,
-                                mazeCells: widget.mazeGenerator.mazeCells
-                                    .cast<List<MazeCell>>(),
-                                cellSize: cellSize,
-                                offsetX: offsetX,
-                                offsetY: offsetY,
-                                bowlImage: bowlImage
-                              ),
+                                  mazeRows: widget.mazeRows,
+                                  mazeColumns: widget.mazeColumns,
+                                  mazeCells: widget.mazeGenerator.mazeCells
+                                      .cast<List<MazeCell>>(),
+                                  cellSize: cellSize,
+                                  offsetX: offsetX,
+                                  offsetY: offsetY,
+                                  bowlImage: bowlImage),
                               size: Size(
                                   constraints.maxWidth, constraints.maxHeight),
                             ),
@@ -455,7 +459,7 @@ class MazePainterStyled extends CustomPainter {
   final double cellSize;
   final double offsetX;
   final double offsetY;
-  late ui.Image bowlImage;
+  final ui.Image bowlImage;
 
   MazePainterStyled({
     required this.mazeRows,
@@ -595,17 +599,16 @@ class MazePainterStyled extends CustomPainter {
         if (!cell.wallDownOpened)
           canvas.drawLine(Offset(x, y + cellSize),
               Offset(x + cellSize, y + cellSize), wallPaint);
-        if(i == mazeRows - 1 && j == mazeColumns - 1) {
+        if (i == mazeRows - 1 && j == mazeColumns - 1) {
           canvas.drawImageRect(
-            bowlImage,
-            Rect.fromLTWH(
-                0, 0, bowlImage.width.toDouble(), bowlImage.height.toDouble()),
-            Rect.fromCenter(
-                center: Offset(x + cellSize / 2, y + 4*cellSize / 2),
-                width: 3*cellSize * 1,
-                height: 2*cellSize* 1),
-            Paint()
-          );
+              bowlImage,
+              Rect.fromLTWH(0, 0, bowlImage.width.toDouble(),
+                  bowlImage.height.toDouble()),
+              Rect.fromCenter(
+                  center: Offset(x + cellSize / 2, y + 4 * cellSize / 2),
+                  width: 3 * cellSize * 1,
+                  height: 2 * cellSize * 1),
+              Paint());
         }
       }
     }
