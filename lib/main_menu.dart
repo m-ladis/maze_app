@@ -240,8 +240,12 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
                       MaterialPageRoute(
                         builder: (context) => MyHomePage(
                           title: 'Maze App',
-                          mazeColumns: getCellsForDifficulty(Difficulty.easy).a,
-                          mazeRows: getCellsForDifficulty(Difficulty.easy).b,
+                          mazeColumns:
+                              getCellsForScreenSize(Difficulty.easy, screenSize)
+                                  .a,
+                          mazeRows:
+                              getCellsForScreenSize(Difficulty.easy, screenSize)
+                                  .b,
                           hintEnabled: true,
                           mouseEnabled: false,
                         ),
@@ -261,9 +265,12 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
                       MaterialPageRoute(
                         builder: (context) => MyHomePage(
                           title: 'Maze App',
-                          mazeColumns:
-                              getCellsForDifficulty(Difficulty.normal).a,
-                          mazeRows: getCellsForDifficulty(Difficulty.normal).b,
+                          mazeColumns: getCellsForScreenSize(
+                                  Difficulty.normal, screenSize)
+                              .a,
+                          mazeRows: getCellsForScreenSize(
+                                  Difficulty.normal, screenSize)
+                              .b,
                           hintEnabled: true,
                           mouseEnabled: false,
                         ),
@@ -283,8 +290,12 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
                       MaterialPageRoute(
                         builder: (context) => MyHomePage(
                           title: 'Maze App',
-                          mazeColumns: getCellsForDifficulty(Difficulty.hard).a,
-                          mazeRows: getCellsForDifficulty(Difficulty.hard).b,
+                          mazeColumns:
+                              getCellsForScreenSize(Difficulty.hard, screenSize)
+                                  .a,
+                          mazeRows:
+                              getCellsForScreenSize(Difficulty.hard, screenSize)
+                                  .b,
                           hintEnabled: false,
                           mouseEnabled: true,
                         ),
@@ -350,14 +361,11 @@ class _HoverButtonState extends State<HoverButton> {
           onTap: widget.onPressed,
           borderRadius: BorderRadius.circular(30),
           child: Center(
-            child: Text(
-              widget.text,
-              style: GoogleFonts.dynaPuff(
-                fontSize: 20,
-                color: Color(0xFF3A4F75),
-                fontWeight: FontWeight.w500
-              )
-            ),
+            child: Text(widget.text,
+                style: GoogleFonts.dynaPuff(
+                    fontSize: 20,
+                    color: Color(0xFF3A4F75),
+                    fontWeight: FontWeight.w500)),
           ),
         ),
       ),
