@@ -69,6 +69,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late ui.Image playerImage;
   late ui.Image pawImage;
   late ui.Image bowlImage;
+  late ui.Image yarnBallImage;
   bool imageLoaded = false;
 
   @override
@@ -99,7 +100,8 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void _loadImages() async {
     bowlImage = await loadImage('assets/bowl.png');
     playerImage = await loadImage('assets/cat.png');
-    pawImage = await loadImage('assets/paw.png'); // stavi ispravnu putanju
+    pawImage = await loadImage('assets/paw.png');
+    yarnBallImage = await loadImage('assets/yarn_ball.png');
     setState(() {
       imageLoaded = true;
     });
@@ -307,14 +309,14 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               ),
                             CustomPaint(
                               painter: MousePainterStyled(
-                                mazeRows: widget.mazeRows,
-                                mazeColumns: widget.mazeColumns,
-                                mousePositionCell: widget.mousePositionCell,
-                                isEnabled: widget.mouseEnabled,
-                                cellSize: cellSize,
-                                offsetX: offsetX,
-                                offsetY: offsetY,
-                              ),
+                                  mazeRows: widget.mazeRows,
+                                  mazeColumns: widget.mazeColumns,
+                                  mousePositionCell: widget.mousePositionCell,
+                                  isEnabled: widget.mouseEnabled,
+                                  cellSize: cellSize,
+                                  offsetX: offsetX,
+                                  offsetY: offsetY,
+                                  yarnBallImage: yarnBallImage),
                               size: Size(
                                   constraints.maxWidth, constraints.maxHeight),
                             ),
@@ -668,6 +670,7 @@ class MousePainterStyled extends CustomPainter {
   final double cellSize;
   final double offsetX;
   final double offsetY;
+  final ui.Image yarnBallImage;
 
   MousePainterStyled({
     required this.mazeRows,
@@ -677,18 +680,26 @@ class MousePainterStyled extends CustomPainter {
     required this.cellSize,
     required this.offsetX,
     required this.offsetY,
+    required this.yarnBallImage,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (!isEnabled) return;
 
-    final paint = Paint()..color = Colors.red;
     double centerX = mousePositionCell.a * cellSize + cellSize / 2 + offsetX;
     double centerY = mousePositionCell.b * cellSize + cellSize / 2 + offsetY;
     double radius = cellSize / 3;
 
-    canvas.drawCircle(Offset(centerX, centerY), radius, paint);
+    canvas.drawImageRect(
+        yarnBallImage,
+        Rect.fromLTWH(0, 0, yarnBallImage.width.toDouble(),
+            yarnBallImage.height.toDouble()),
+        Rect.fromCenter(
+            center: Offset(centerX, centerY),
+            width: cellSize * 0.75,
+            height: cellSize * 0.65),
+        Paint());
   }
 
   @override
