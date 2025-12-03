@@ -20,8 +20,7 @@ Pair<int, int> getCellsForScreenSize(Difficulty difficulty, Size screenSize) {
   final mazeCells = mazeDimensions.a * mazeDimensions.b;
 
   final screenAspectRatio = screenSize.height / screenSize.width;
-  final mazeRows =
-      (mazeCells / mazeDimensions.a * screenAspectRatio * 0.65).toInt();
+  final mazeRows = (mazeDimensions.a * screenAspectRatio * 0.65).toInt();
   final mazeColumns = mazeCells / mazeRows;
 
   if (screenAspectRatio * 0.65 >= 1.0) {
