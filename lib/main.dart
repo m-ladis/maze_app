@@ -135,6 +135,11 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+//     final density = MediaQuery.of(context).devicePixelRatio;
+//     double scale = (density / 2.5).clamp(0.6, 1.4);
+    final height = MediaQuery.of(context).size.height;
+    double scale = (height / 800).clamp(1.0, 1.5);
+
     final hintIcon = (widget.hintEnabled)
         ? const Icon(Icons.lightbulb_rounded, color: Colors.orange)
         : const Icon(Icons.lightbulb_outline, color: Colors.white);
@@ -360,16 +365,14 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 child: ConfettiWidget(
                                   confettiController: _confettiController,
                                   blastDirectionality: BlastDirectionality.explosive,
-                                  numberOfParticles: 30,        // manje konfeta
-                                  emissionFrequency: 0.02,      // rjeđa emisija
-                                  maxBlastForce: 15,            // tiši "explosion"
-                                  minBlastForce: 5,
-                                  gravity: 0.1,                 // sporiji pad
-                                  particleDrag: 0.03,           // malo ublažava kretanje
+                                  numberOfParticles: 30,
+                                  emissionFrequency: 0.02,
+                                  maxBlastForce: 16 * scale,
+                                  minBlastForce: 6 * scale,
+                                  gravity: 0.2 / scale,
+                                  particleDrag: 0.03,
                                 ),
-                              )
-
-
+                              ),
 
                           ],
                         );
