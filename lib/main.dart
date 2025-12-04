@@ -169,7 +169,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 child: Row(children: [
                                   Image.asset('assets/cat.png', height: 47),
                                   const SizedBox(width: 10),
-                                  Text("Maze Game",
+                                  Text("Cat Maze",
                                       style: GoogleFonts.rubikPuddles(
                                         fontSize: 33,
                                         color: Colors.white,
